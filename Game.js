@@ -44,34 +44,129 @@ var sketchProc = function(processingInstance) {
     const IMAGESIZE = 64;
     const ROTATESPEED = 0.03;
 
+    rocketOneImage = [
+      loadImage("./images/r1f1.png"),
+      loadImage("./images/r1f2.png"),
+      loadImage("./images/r1f3.png"),
+      loadImage("./images/r1f4.png")
+    ];
+    rocketTwoImage = [
+      loadImage("./images/r2f1.png"),
+      loadImage("./images/r2f2.png"),
+      loadImage("./images/r2f3.png"),
+      loadImage("./images/r2f4.png")
+    ];
+    rocketThreeImage = [
+      loadImage("./images/r3f1.png"),
+      loadImage("./images/r3f2.png"),
+      loadImage("./images/r3f3.png"),
+      loadImage("./images/r3f4.png")
+    ];
+    rocketFourImage = [
+      loadImage("./images/r4f1.png"),
+      loadImage("./images/r4f2.png"),
+      loadImage("./images/r4f3.png"),
+      loadImage("./images/r4f4.png")
+    ];
+    rocketFiveImage = [
+      loadImage("./images/r5f1.png"),
+      loadImage("./images/r5f2.png"),
+      loadImage("./images/r5f3.png"),
+      loadImage("./images/r5f4.png")
+    ];
+    rocketSixImage = [
+      loadImage("./images/r6f1.png"),
+      loadImage("./images/r6f2.png"),
+      loadImage("./images/r6f3.png"),
+      loadImage("./images/r6f4.png")
+    ];
+
     class rocketObj {
       constructor(x, y, img, direction) {
-        this.x = x;
-        this.y = y;
-        this.img = loadImage(img);
-        this.angle = 0;
+        this.pos = new PVector(x, y);
+        this.nextPos = new PVector(x, y);
+        this.img = img;
+        this.imgIndex = 0;
+        this.curAngle = 0;
+        this.nextAngle = 0;
         this.direction = direction;
+        this.moving = false;
+        this.curFrame = frameCount;
+        this.state = "stationary";
+        this.size = IMAGESIZE;
       }
 
       display() {
+        if (this.moving && frameCount - this.curFrame > 3) {
+          this.curFrame = frameCount;
+          this.imgIndex = Math.floor(Math.random() * 4);
+        }
+
+        if (!this.moving) {
+          this.imgIndex = 0;
+        }
+
+        if (this.moving) {
+          this.action();
+        } else {
+          this.direction === "cw"
+            ? (this.curAngle -= ROTATESPEED)
+            : (this.curAngle += ROTATESPEED);
+        }
         pushMatrix();
-        translate(this.x, this.y);
+        translate(this.pos.x, this.pos.y);
         imageMode(CENTER);
-        rotate(this.angle);
-        image(this.img, 0, 0, IMAGESIZE, IMAGESIZE);
+        rotate(this.curAngle);
+        image(this.img[this.imgIndex], 0, 0, this.size, this.size);
         popMatrix();
-        this.direction === "cw"
-          ? (this.angle -= ROTATESPEED)
-          : (this.angle += ROTATESPEED);
       }
 
-      fly() {}
+      move(desX, desY) {
+        this.moving = true;
+        this.nextPos.set(desX, desY);
+        this.nextAngle =
+          Math.atan2(desY - this.pos.y, desX - this.pos.x) + PI / 2;
+        this.state = "rotate";
+      }
+
+      action() {
+        switch (this.state) {
+          case "rotate":
+            Math.abs(this.curAngle - this.nextAngle) <= 0.03
+              ? (this.state = "move")
+              : (this.state = "rotate");
+            this.curAngle > this.nextAngle
+              ? (this.curAngle -= ROTATESPEED)
+              : (this.curAngle += ROTATESPEED);
+            break;
+          case "move":
+            if (
+              dist(this.pos.x, this.pos.y, this.nextPos.x, this.nextPos.y) === 0
+            ) {
+              this.state = "stationary";
+              this.moving = false;
+            } else {
+              this.pos.x > this.nextPos.x
+                ? this.pos.x--
+                : this.pos.x < this.nextPos.x
+                ? this.pos.x++
+                : (this.pos.x = this.pos.x);
+              this.pos.y > this.nextPos.y
+                ? this.pos.y--
+                : this.pos.y < this.nextPos.y
+                ? this.pos.y++
+                : (this.pos.y = this.pos.y);
+            }
+            break;
+          case "stationary":
+            break;
+        }
+      }
     }
 
     class earthObj {
-      constructor(x, y, img) {
-        this.x = x;
-        this.y = y;
+      constructor(x, y, img, direction) {
+        this.pos = new PVector(x, y);
         this.img = loadImage(img);
         this.opacity = 50;
       }
@@ -79,7 +174,7 @@ var sketchProc = function(processingInstance) {
         pushMatrix();
         imageMode(CENTER);
         tint(255, 255, 255, this.opacity);
-        image(this.img, this.x, this.y, 300, 300);
+        image(this.img, this.pos.x, this.pos.y, 300, 300);
         tint(255, 255, 255, 255);
         popMatrix();
         if (this.opacity < 255) {
@@ -91,147 +186,94 @@ var sketchProc = function(processingInstance) {
     class openObj {
       constructor() {
         this.startShow = false;
-        this.rocketOne = new rocketObj(
-          100,
-          100,
-          "./images/rocketone.png",
-          "ccw"
-        );
-        this.rocketTwo = new rocketObj(
-          350,
-          750,
-          "./images/rockettwo.png",
-          "ccw"
-        );
-        this.rocketThree = new rocketObj(
-          620,
-          470,
-          "./images/rocketthree.png",
-          "cw"
-        );
-        this.rocketFour = new rocketObj(
-          700,
-          200,
-          "./images/rocketfour.png",
-          "ccw"
-        );
-        this.rocketFive = new rocketObj(
-          150,
-          500,
-          "./images/rocketfive.png",
-          "cw"
-        );
-        this.rocketSix = new rocketObj(
-          750,
-          720,
-          "./images/rocketsix.png",
-          "cw"
-        );
+        this.rocketOne = new rocketObj(100, 100, rocketOneImage, "ccw");
+        // this.rocketTwo = new rocketObj(100, 100, rocketTwoImage, "ccw");
+        // this.rocketThree = new rocketObj(100, 100, rocketThreeImage, "cw");
+        // this.rocketFour = new rocketObj(100, 100, rocketFourImage, "ccw");
+        // this.rocketFive = new rocketObj(100, 100, rocketFiveImage, "cw");
+        // this.rocketSix = new rocketObj(100, 100, rocketSixImage, "cw");
         this.earth = new earthObj(400, 400, "./images/earth.png");
       }
 
       display() {
         this.rocketOne.display();
-        this.rocketTwo.display();
-        this.rocketThree.display();
-        this.rocketFour.display();
-        this.rocketFive.display();
-        this.rocketSix.display();
+        // this.rocketTwo.display();
+        // this.rocketThree.display();
+        // this.rocketFour.display();
+        // this.rocketFive.display();
+        // this.rocketSix.display();
         if (this.startShow) {
-          this.show();
+          this.earth.display();
         }
       }
 
       show() {
-        this.earth.display();
+        this.startShow = true;
+        this.rocketOne.move(400, 400);
       }
     }
 
     //############################################### SCORE SCREEN ######################################
-
-    class bigRocketObj {
-      constructor(x, y, img) {
-        this.x = x;
-        this.y = y;
-        this.img = loadImage(img);
-        this.direction = "top";
-        this.angle = 0;
-        this.nextAngle = PI / 2;
+    class bigRocketObj extends rocketObj {
+      constructor(x, y, img, direction) {
+        super();
+        this.pos = new PVector(x, y);
+        this.nextPos = new PVector(x, y);
+        this.img = img;
+        this.imgIndex = 0;
+        this.curAngle = 0;
+        this.nextAngle = 0;
+        this.direction = direction;
+        this.moving = false;
+        this.curFrame = frameCount;
+        this.state = "stationary";
+        this.travelPos = "left";
+        this.size = IMAGESIZE * 2;
       }
 
-      display() {
-        switch (this.direction) {
+      travel() {
+        this.display();
+        switch (this.travelPos) {
+          case "left":
+            if (!this.moving) {
+              this.move(400, 50);
+              this.travelPos = "top";
+            }
+            break;
+
           case "top":
-            if (this.x == 400) {
-              this.angle += ROTATESPEED;
-              if (this.angle > this.nextAngle) {
-                this.direction = "right";
-                this.nextAngle += PI / 2;
-              }
-            } else {
-              this.x++;
-              this.y--;
+            if (!this.moving) {
+              this.move(750, 400);
+              this.travelPos = "right";
             }
             break;
 
           case "right":
-            if (this.y == 400) {
-              this.angle += ROTATESPEED;
-              if (this.angle > this.nextAngle) {
-                this.direction = "bottom";
-                this.nextAngle += PI / 2;
-              }
-            } else {
-              this.x++;
-              this.y++;
+            if (!this.moving) {
+              this.move(400, 750);
+              this.travelPos = "bottom";
             }
             break;
 
           case "bottom":
-            if (this.x == 400) {
-              this.angle += ROTATESPEED;
-              if (this.angle > this.nextAngle) {
-                this.direction = "left";
-                this.nextAngle += PI / 2;
-              }
-            } else {
-              this.x--;
-              this.y++;
-            }
-            break;
-
-          case "left":
-            if (this.y == 400) {
-              this.angle += ROTATESPEED;
-              if (this.angle > this.nextAngle) {
-                this.direction = "top";
-                this.nextAngle += PI / 2;
-              }
-            } else {
-              this.x--;
-              this.y--;
+            if (!this.moving) {
+              this.move(50, 400);
+              this.travelPos = "left";
             }
             break;
         }
-
-        pushMatrix();
-        imageMode(CENTER);
-        translate(this.x, this.y);
-        rotate(this.angle);
-        image(this.img, 0, 0, IMAGESIZE * 2, IMAGESIZE * 2);
-        popMatrix();
       }
     }
 
     class scoreObj {
       constructor() {
-        this.bigRocket = new bigRocketObj(70, 400, "./images/rocketone.png");
+        this.bigRocket = new bigRocketObj(50, 400, rocketOneImage, "ccw");
         this.score = 0;
       }
 
       display(score) {
         this.score = score;
-        this.bigRocket.display();
+        this.bigRocket.travel();
         textAlign(CENTER);
         textLeading(10); //set line distance
         textFont(createFont("monospace", 30), 30);
@@ -267,7 +309,7 @@ var sketchProc = function(processingInstance) {
     var keyReleased = function() {};
 
     var mouseClicked = function() {
-      openScreen.startShow = true;
+      openScreen.show();
     };
 
     var draw = function() {
