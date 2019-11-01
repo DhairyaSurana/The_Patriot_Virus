@@ -1,4 +1,5 @@
-# THE PATRIOT VIRUS
+# THE PATRIOT VIRUS  
+### Author: Hung Tran, Dhairya Surana
 
 > ## IMPORTANT!!
 
@@ -6,7 +7,7 @@
 
 To run the game, please visit the website above.  
 This game DOES NOT WORK on Khan Academy due to various reasons.  
-One of the main reason is that the game is written in ES6 and contained exteral images.
+One of the main reasons is that the game is written in ES6 and contained exteral images.
 
 > ## Game Layout
 
