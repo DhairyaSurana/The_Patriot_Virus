@@ -426,6 +426,10 @@ var sketchProc = function(processingInstance) {
         text("HOW TO PLAY", 400, 440);
         text("SCORE", 400, 520);
         text("ACHIVEMENT", 400, 600);
+        fill(39, 36, 89, 150);
+        textSize(15);
+        text("Represented By Hung Tran & Dhairya Surana", 400, 280);
+
       }
 
       select(x, y, clicked) {
@@ -451,9 +455,9 @@ var sketchProc = function(processingInstance) {
     }
     //############################################### INSTRUCTION SCREEN ######################################
     var content =
-      "Feed virus instruction to MIPS architecture " +
+      "Feed the virus instructions into MIPS architecture " +
       "\nprocessor that control the rockets " +
-      "to destry them." +
+      "to destroy them." +
       "\nMove Left: A" +
       "\nMove Right: D" +
       "\nJump: Space Bar" +
@@ -532,6 +536,9 @@ var sketchProc = function(processingInstance) {
     }
 
     //############################################### SCORE SCREEN ############################################
+    
+    //                                        _______ BIG ROCKET OBJECT__________
+
     class bigRocketObj extends rocketObj {
       constructor(x, y, img, direction) {
         super();
@@ -582,7 +589,7 @@ var sketchProc = function(processingInstance) {
         }
       }
     }
-    console.log(PFont.list());
+    //                                        _______ SCORE SCREEN OBJECT__________
 
     class scoreObj {
       constructor() {
@@ -666,12 +673,14 @@ var sketchProc = function(processingInstance) {
       } else if (STATE.SCORE) {
         sectionPos.x < 800 ? (sectionPos.x += 4) : 1;
       }
-      pushMatrix();
-      translate(sectionPos.x, sectionPos.y);
-      openScreen.display();
-      scoreScreen.display(12);
-      instrScreen.display();
-      popMatrix();
+      if (!STATE.GAME){
+        pushMatrix();
+        translate(sectionPos.x, sectionPos.y);
+        openScreen.display();
+        scoreScreen.display(12);
+        instrScreen.display();
+        popMatrix();
+      }
     };
 
     //######################################################################################################
