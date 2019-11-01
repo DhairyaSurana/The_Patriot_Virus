@@ -1,4 +1,4 @@
-var sketchProc = function (processingInstance) {
+var sketchProc = function(processingInstance) {
   with (processingInstance) {
     size(800, 800);
     frameRate(60);
@@ -44,7 +44,7 @@ var sketchProc = function (processingInstance) {
 
     // When developing locally, set url = "."
     // otherwise, set url = "https://thepatriotvirus.s3.amazonaws.com"
-    url = "."
+    url = ".";
     openTitleImage = loadImage(url + "/images/gameTitle.png");
     instrTitleImage = loadImage(url + "/images/instrTitle.png");
     scoreTitleImage = loadImage(url + "/images/scoreTitle.png");
@@ -199,15 +199,13 @@ var sketchProc = function (processingInstance) {
               this.pos.x > this.nextPos.x
                 ? this.pos.x--
                 : this.pos.x < this.nextPos.x
-                  ? this.pos.x++
-                  : (this.pos.x = this.pos.x);
+                ? this.pos.x++
+                : (this.pos.x = this.pos.x);
               this.pos.y > this.nextPos.y
                 ? this.pos.y--
                 : this.pos.y < this.nextPos.y
-                  ? this.pos.y++
-                  : (this.pos.y = this.pos.y);
-
-
+                ? this.pos.y++
+                : (this.pos.y = this.pos.y);
             }
             break;
           case "stationary":
@@ -310,13 +308,13 @@ var sketchProc = function (processingInstance) {
           this.pos.x > this.nextPos.x
             ? this.pos.x--
             : this.pos.x < this.nextPos.x
-              ? this.pos.x++
-              : (this.pos.x = this.pos.x);
+            ? this.pos.x++
+            : (this.pos.x = this.pos.x);
           this.pos.y > this.nextPos.y
             ? this.pos.y--
             : this.pos.y < this.nextPos.y
-              ? this.pos.y++
-              : (this.pos.y = this.pos.y);
+            ? this.pos.y++
+            : (this.pos.y = this.pos.y);
         }
       }
     }
@@ -436,7 +434,6 @@ var sketchProc = function (processingInstance) {
         fill(39, 36, 89, 150);
         textSize(15);
         text("Represented By Hung Tran & Dhairya Surana", 400, 280);
-
       }
 
       select(x, y, clicked) {
@@ -631,7 +628,7 @@ var sketchProc = function (processingInstance) {
 
     //############################################### GAME SCREEN ######################################
 
-    class playerOjb { }
+    class playerOjb {}
 
     class gameOjb {
       constructor() {
@@ -646,48 +643,42 @@ var sketchProc = function (processingInstance) {
     //                                        _______ EXPLOSION OBJECT__________
     class explosionObj {
       constructor(a) {
-
         this.position = new PVector(0, 0);
         this.direction = new PVector(0, 0);
         this.size = random(1, 20);
         if (a === 0) {
           this.c1 = random(0, 250);
-        }
-        else {
+        } else {
           this.c1 = random(100, 255);
         }
         if (a === 1) {
           this.c2 = random(0, 250);
-        }
-        else {
+        } else {
           this.c2 = random(100, 255);
         }
         if (a === 3) {
           this.c3 = random(0, 250);
-        }
-        else {
+        } else {
           this.c3 = random(100, 255);
         }
         this.timer = 0;
       }
 
       display() {
-
-        fill(this.c1, this.c2, this.c3, this.timer);	// 4th value fader
+        fill(this.c1, this.c2, this.c3, this.timer); // 4th value fader
         noStroke();
         ellipse(this.position.x, this.position.y, this.size, this.size);
 
         this.position.x += this.direction.y * cos(this.direction.x);
         this.position.y += this.direction.y * sin(this.direction.x);
         /*  this.position.add(this.direction); // random cartesian direction */
-        this.position.y += (90 / (this.timer + 100));    //gravity
+        this.position.y += 90 / (this.timer + 100); //gravity
         this.timer--;
       }
     }
 
     //                                        _______ FIREWORK OBJECT__________
     class fireworkObj {
-
       constructor(a) {
         this.position = new PVector(200, 380);
         this.direction = new PVector(0, 0);
@@ -700,13 +691,15 @@ var sketchProc = function (processingInstance) {
       }
 
       display() {
-
         fill(255, 255, 255);
         noStroke();
         ellipse(this.position.x, this.position.y, 2, 2);
 
         this.position.add(this.direction);
-        if (dist(this.position.x, this.position.y, this.target.x, this.target.y) < 4) {
+        if (
+          dist(this.position.x, this.position.y, this.target.x, this.target.y) <
+          4
+        ) {
           this.step = 2;
           for (var i = 0; i < this.explosions.length; i++) {
             this.explosions[i].position.set(this.target.x, this.target.y);
@@ -719,11 +712,14 @@ var sketchProc = function (processingInstance) {
 
     //                                        _______ ACHIEVEMENT OBJECT__________
     class achievementObj {
-
       constructor() {
         this.y = 800;
         this.achievements = [];
-        this.achievementTitle = new titleOjb(400, this.y + 200, achievementTitleImage);
+        this.achievementTitle = new titleOjb(
+          400,
+          this.y + 200,
+          achievementTitleImage
+        );
         this.firework = [];
         for (var i = 0; i < 10; i++) {
           this.firework.push(new fireworkObj(random(0, 2)));
@@ -731,20 +727,20 @@ var sketchProc = function (processingInstance) {
       }
 
       displayFireworks() {
-
         for (var j = 0; j < this.firework.length; j++) {
           if (this.firework[j].step === 0) {
             this.firework[j].position.set(400, 1500);
             this.firework[j].target.set(random(100, 800), random(800, 1600));
-            this.firework[j].direction.set(this.firework[j].target.x - this.firework[j].position.x, this.firework[j].target.y - this.firework[j].position.y);
+            this.firework[j].direction.set(
+              this.firework[j].target.x - this.firework[j].position.x,
+              this.firework[j].target.y - this.firework[j].position.y
+            );
             var s = random(1, 2) / 100;
             this.firework[j].direction.mult(s);
             this.firework[j].step++;
-          }
-          else if (this.firework[j].step === 1) {
+          } else if (this.firework[j].step === 1) {
             this.firework[j].display();
-          }
-          else if (this.firework[j].step === 2) {
+          } else if (this.firework[j].step === 2) {
             for (var i = 0; i < this.firework[j].explosions.length; i++) {
               this.firework[j].explosions[i].display();
             }
@@ -756,7 +752,6 @@ var sketchProc = function (processingInstance) {
       }
 
       display() {
-
         rectMode(CENTER);
         fill(44, 31, 34);
         rect(0, 1200, 1600, 800);
@@ -786,21 +781,21 @@ var sketchProc = function (processingInstance) {
     var sectionPos = new PVector(0, 0);
     //############################################### INPUT CONTROL ######################################
 
-    var keyPressed = function () {
+    var keyPressed = function() {
       if (keyCode === 192) {
         changePage("OPEN");
       }
     };
 
-    var keyReleased = function () { };
+    var keyReleased = function() {};
 
-    var mouseClicked = function () {
+    var mouseClicked = function() {
       if (STATE.OPEN && !openScreen.startShow) {
         openScreen.select(mouseX, mouseY, true);
       }
     };
 
-    var mouseMoved = function () {
+    var mouseMoved = function() {
       if (STATE.OPEN) {
         openScreen.select(mouseX, mouseY, false);
       }
@@ -808,19 +803,19 @@ var sketchProc = function (processingInstance) {
 
     //############################################### EXECUTION ######################################
     background(245, 222, 179);
-    var draw = function () {
+    var draw = function() {
       if (STATE.OPEN) {
         sectionPos.x < 0
           ? (sectionPos.x += 4)
           : sectionPos.x > 0
-            ? (sectionPos.x -= 4)
-            : 1;
+          ? (sectionPos.x -= 4)
+          : 1;
 
         sectionPos.y < 0
           ? (sectionPos.y += 4)
           : sectionPos.y > 0
-            ? (sectionPos.y -= 4)
-            : 1;
+          ? (sectionPos.y -= 4)
+          : 1;
       } else if (STATE.GAME) {
       } else if (STATE.INSTRUCTION) {
         sectionPos.x > -800 ? (sectionPos.x -= 4) : 1;
@@ -828,7 +823,6 @@ var sketchProc = function (processingInstance) {
         sectionPos.x < 800 ? (sectionPos.x += 4) : 1;
       } else if (STATE.ACHIEVEMENT) {
         sectionPos.y > -800 ? (sectionPos.y -= 4) : 1;
-
       }
 
       if (!STATE.GAME) {
@@ -840,7 +834,6 @@ var sketchProc = function (processingInstance) {
         achievementScreen.display();
         popMatrix();
       }
-
     };
 
     //######################################################################################################
