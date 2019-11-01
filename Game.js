@@ -114,6 +114,8 @@ var sketchProc = function(processingInstance) {
         this.exploding = false;
         this.rocketImg = img;
         this.collide = false;
+
+        this.speed = 1;
       }
 
       display() {
@@ -173,15 +175,17 @@ var sketchProc = function(processingInstance) {
               this.moving = false;
             } else {
               this.pos.x > this.nextPos.x
-                ? this.pos.x--
+                ? this.pos.x-=this.speed
                 : this.pos.x < this.nextPos.x
-                ? this.pos.x++
+                ? this.pos.x+=this.speed
                 : (this.pos.x = this.pos.x);
               this.pos.y > this.nextPos.y
-                ? this.pos.y--
+                ? this.pos.y-=this.speed
                 : this.pos.y < this.nextPos.y
-                ? this.pos.y++
+                ? this.pos.y+=this.speed
                 : (this.pos.y = this.pos.y);
+
+              this.speed+=0.5;
             }
             break;
           case "stationary":
