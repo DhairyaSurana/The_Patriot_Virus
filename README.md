@@ -16,7 +16,7 @@ One of the main reasons is that the game is written in ES6 and contained exteral
   - Menu section:
   - Instruction section:
   - Score section:
-  - Achivement section:
+  - Achievements section:
 
 - Play page:
   - Game play
@@ -42,10 +42,11 @@ One of the main reasons is that the game is written in ES6 and contained exteral
     has a big rocket circling from the mid left side to the screen  
     to the mid top side, then mid right, then repeated.
   - The player could go back to the menu screen by pressing **`**
-* ### Achive section
+* ### Achievements section
   - In the main game, there are 3 small challenges. Every time the  
     player completes one of them, they will receive an achivement. All  
-    the achivement from the player will be displayed here.
+    the achievements from the player will be displayed here. Fireworks will  
+    be displayed to celebrate the player's accomplishments.
   - The player could go back to the menu screen by pressing **`**.
 
 > ## Play Page
