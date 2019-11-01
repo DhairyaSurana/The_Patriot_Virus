@@ -2,7 +2,8 @@ var sketchProc = function(processingInstance) {
   with (processingInstance) {
     size(800, 800);
     frameRate(60);
-    var gameFont = createFont("monospace");
+    var gameFont = createFont("Bitstream Charter Bold");
+    noStroke();
     //######################################################################################################
     //##############################################START HERE##############################################
     //######################################################################################################
@@ -10,40 +11,40 @@ var sketchProc = function(processingInstance) {
       OPEN: true,
       GAME: false,
       INSTRUCTION: false,
-      SCORE: false
+      SCORE: false,
+      ACHIVEMENT: false
     };
 
     var changePage = function changePage(page) {
+      STATE.OPEN = false;
+      STATE.GAME = false;
+      STATE.INSTRUCTION = false;
+      STATE.SCORE = false;
+      STATE.ACHIVEMENT = false;
       switch (page) {
         case "OPEN":
           STATE.OPEN = true;
-          STATE.GAME = false;
-          STATE.INSTRUCTION = false;
-          STATE.SCORE = false;
           break;
         case "GAME":
-          STATE.OPEN = false;
           STATE.GAME = true;
-          STATE.INSTRUCTION = false;
-          STATE.SCORE = false;
           break;
         case "INSTRUCTION":
-          STATE.OPEN = false;
-          STATE.GAME = false;
           STATE.INSTRUCTION = true;
-          STATE.SCORE = false;
           break;
         case "SCORE":
-          STATE.OPEN = false;
-          STATE.GAME = false;
-          STATE.INSTRUCTION = false;
           STATE.SCORE = true;
+          break;
+        case "ACHIVEMENT":
+          STATE.ACHIVEMENT = true;
           break;
       }
     };
 
     //############################################### LOAD IMAGES ######################################
-    gameTitleImage = loadImage("./images/gameTitle.png");
+    openTitleImage = loadImage("./images/gameTitle.png");
+    instrTitleImage = loadImage("./images/instrTitle.png");
+    scoreTitleImage = loadImage("./images/scoreTitle.png");
+    earthImage = loadImage("./images/earth.png");
     ouchImage = [
       loadImage("./images/ouch.png"),
       loadImage("./images/ouch.png"),
@@ -97,11 +98,12 @@ var sketchProc = function(processingInstance) {
     //############################################### OPENING SCREEN ######################################
     const IMAGESIZE = 64;
     const ROTATESPEED = 0.03;
-
+    //                                        _______ ROCKET OBJECT__________
     class rocketObj {
       constructor(x, y, img, direction) {
         this.pos = new PVector(x, y);
         this.nextPos = new PVector(x, y);
+        this.orgPos = this.pos;
         this.img = img;
         this.imgIndex = 0;
         this.curAngle = 0;
@@ -116,6 +118,20 @@ var sketchProc = function(processingInstance) {
         this.collide = false;
 
         this.speed = 1;
+      }
+
+      reset() {
+        this.pos = this.orgPos;
+        this.nextPos = this.orgPos;
+        this.imgIndex = 0;
+        this.curAngle = 0;
+        this.nextAngle = 0;
+        this.moving = false;
+        this.curFrame = frameCount;
+        this.state = "stationary";
+        this.exploding = false;
+        this.img = this.rocketImg;
+        this.collide = false;
       }
 
       display() {
@@ -150,6 +166,9 @@ var sketchProc = function(processingInstance) {
       }
 
       move(desX, desY) {
+        if (this.moving) {
+          return;
+        }
         this.moving = true;
         this.nextPos.set(desX, desY);
         this.nextAngle =
@@ -223,15 +242,20 @@ var sketchProc = function(processingInstance) {
       }
     }
 
+    //                                        _______ EARTH OBJECT__________
     class earthObj {
-      constructor(x, y, img, direction) {
+      constructor(x, y, img) {
         this.pos = new PVector(x, y);
-        this.img = loadImage(img);
+        this.img = img;
         this.opacity = 50;
-        this.show = false;
+        this.showing = false;
+      }
+      reset() {
+        this.opacity = 50;
+        this.showing = false;
       }
       display() {
-        if (this.show) {
+        if (this.showing) {
           pushMatrix();
           imageMode(CENTER);
           tint(255, 255, 255, this.opacity);
@@ -243,10 +267,58 @@ var sketchProc = function(processingInstance) {
           }
         }
       }
-      move() {
-        this.show = true;
+      show() {
+        this.showing = true;
       }
     }
+
+    //                                          _______ TITLE OBJECT__________
+
+    class titleOjb {
+      constructor(x, y, img) {
+        this.pos = new PVector(x, y);
+        this.nextPos = new PVector(x, y);
+        this.img = img;
+        this.moving = false;
+      }
+
+      display() {
+        if (this.moving) {
+          this.executeMove();
+        }
+
+        pushMatrix();
+        imageMode(CENTER);
+        image(this.img, this.pos.x, this.pos.y, 500, 100);
+        popMatrix();
+      }
+
+      move(desX, desY) {
+        this.moving = true;
+        this.nextPos.set(desX, desY);
+      }
+
+      executeMove() {
+        if (
+          dist(this.pos.x, this.pos.y, this.nextPos.x, this.nextPos.y) === 0
+        ) {
+          this.moving = false;
+        } else {
+          this.pos.x > this.nextPos.x
+            ? this.pos.x--
+            : this.pos.x < this.nextPos.x
+            ? this.pos.x++
+            : (this.pos.x = this.pos.x);
+          this.pos.y > this.nextPos.y
+            ? this.pos.y--
+            : this.pos.y < this.nextPos.y
+            ? this.pos.y++
+            : (this.pos.y = this.pos.y);
+        }
+      }
+    }
+
+    //                                        _______ OPEN SCREEN OBJECT__________
 
     class openObj {
       constructor() {
@@ -256,30 +328,46 @@ var sketchProc = function(processingInstance) {
         this.rocketFour = new rocketObj(50, 400, rocketFourImage, "ccw");
         this.rocketFive = new rocketObj(500, 50, rocketFiveImage, "cw");
         this.rocketSix = new rocketObj(100, 750, rocketSixImage, "cw");
-        this.earth = new earthObj(400, 400, "./images/earth.png");
+        this.earth = new earthObj(400, 400, earthImage);
+        this.gameTitle = new titleOjb(400, 200, openTitleImage);
         this.startShow = false;
-        this.r = 250;
-        this.g = 185;
-        this.b = 167;
-        this.testing = 200;
+        this.currFrame = 0;
+        this.color = { r: 250, g: 185, b: 167 };
+        this.mouseOn = {
+          PLAY: false,
+          INSTRUCTION: false,
+          SCORE: false,
+          ACHIVEMENT: false
+        };
+      }
+
+      reset() {
+        this.color = { r: 250, g: 185, b: 167 };
+        this.currFrame = 0;
+        this.select(0, 0, false);
+        this.startShow = false;
+        this.rocketOne.reset();
+        this.rocketTwo.reset();
+        this.rocketThree.reset();
+        this.rocketFour.reset();
+        this.rocketFive.reset();
+        this.rocketSix.reset();
+        this.earth.reset();
       }
 
       display() {
-        background(this.r, this.g, this.b);
-
+        background(this.color.r, this.color.g, this.color.b);
         if (this.startShow) {
-          this.r < 250 ? this.r++ : (this.r = this.r);
-          this.g < 240 ? this.g++ : (this.g = this.g);
-          this.b > 127 ? this.b-- : (this.b = this.b);
-          this.testing <  400 ? this.testing++ : this.testing = this.testing;
+          this.changeBGColor();
+          if (frameCount - this.currFrame > 500) {
+            changePage("PLAY");
+            this.reset();
+          }
+        } else {
+          this.showSelection();
         }
 
-        pushMatrix();
-        imageMode(CENTER);
-        translate(400,this.testing);
-        image(gameTitleImage, 0, 0, 500, 100);
-        popMatrix();
-
+        this.gameTitle.display();
         this.rocketOne.display();
         this.rocketTwo.display();
         this.rocketThree.display();
@@ -291,8 +379,13 @@ var sketchProc = function(processingInstance) {
       }
 
       show() {
+        if (this.startShow) {
+          return;
+        }
+        this.currFrame = frameCount;
         this.startShow = true;
-        this.earth.move();
+        this.earth.show();
+        this.gameTitle.move(400, 400);
         this.rocketOne.move(400, 400);
         this.rocketTwo.move(400, 400);
         this.rocketThree.move(400, 400);
@@ -309,9 +402,140 @@ var sketchProc = function(processingInstance) {
         this.rocketFive.collisionCheck(400, 400, 180);
         this.rocketSix.collisionCheck(400, 400, 180);
       }
+
+      changeBGColor() {
+        this.color.r < 250 ? this.color.r++ : (this.color.r = this.color.r);
+        this.color.g < 240 ? this.color.g++ : (this.color.g = this.color.g);
+        this.color.b > 127 ? this.color.b-- : (this.color.b = this.color.b);
+      }
+
+      showSelection() {
+        fill(245, 113, 70);
+        rectMode(CENTER);
+
+        if (this.mouseOn.PLAY) {
+          rect(400, 360, 500, 50, 30);
+        } else if (this.mouseOn.INSTRUCTION) {
+          rect(400, 440, 500, 50, 30);
+        } else if (this.mouseOn.SCORE) {
+          rect(400, 520, 500, 50, 30);
+        } else if (this.mouseOn.ACHIVEMENT) {
+          rect(400, 600, 500, 50, 30);
+        }
+        fill(255, 255, 255);
+        textFont(gameFont, 30);
+        rectMode(CENTER);
+        textAlign(CENTER, CENTER);
+        text("START GAME", 400, 360);
+        text("HOW TO PLAY", 400, 440);
+        text("SCORE", 400, 520);
+        text("ACHIVEMENT", 400, 600);
+      }
+
+      select(x, y, clicked) {
+        this.mouseOn.PLAY = false;
+        this.mouseOn.INSTRUCTION = false;
+        this.mouseOn.SCORE = false;
+        this.mouseOn.ACHIVEMENT = false;
+
+        if (Math.abs(x - 400) < 100 && Math.abs(y - 360) < 20) {
+          this.mouseOn.PLAY = true;
+          clicked === true ? this.show() : 1;
+        } else if (Math.abs(x - 400) < 100 && Math.abs(y - 440) < 20) {
+          this.mouseOn.INSTRUCTION = true;
+          clicked === true ? changePage("INSTRUCTION") : 1;
+        } else if (Math.abs(x - 400) < 100 && Math.abs(y - 520) < 20) {
+          this.mouseOn.SCORE = true;
+          clicked === true ? changePage("SCORE") : 1;
+        } else if (Math.abs(x - 400) < 100 && Math.abs(y - 600) < 20) {
+          this.mouseOn.ACHIVEMENT = true;
+          clicked === true ? changePage("ACHIVEMENT") : 1;
+        }
+      }
+    }
+    //############################################### INSTRUCTION SCREEN ######################################
+    var content =
+      "Feed virus instruction to MIPS architecture " +
+      "\nprocessor that control the rockets " +
+      "to destry them." +
+      "\nMove Left: A" +
+      "\nMove Right: D" +
+      "\nJump: Space Bar" +
+      "\nAttack: Right Click" +
+      "\nExit: `";
+
+    //CITATION: brownianMotion is initially comes from
+    //http://processingjs.org/learning/topic/brownian/
+    class brownianMotion {
+      constructor() {
+        this.maxVal = 2;
+        this.points = [];
+        for (var i = 0; i < this.maxVal; i++) {
+          this.points.push(new PVector(400 + 800, 400));
+        }
+      }
+
+      display() {
+        for (var i = 1; i < this.maxVal; i++) {
+          this.points[i - 1].x = this.points[i].x;
+          this.points[i - 1].y = this.points[i].y;
+        }
+        this.points[this.maxVal - 1].x += random(-100, 100);
+        this.points[this.maxVal - 1].y += random(-100, 100);
+        this.points[this.maxVal - 1].x = constrain(
+          this.points[this.maxVal - 1].x,
+          850,
+          1600
+        );
+        this.points[this.maxVal - 1].y = constrain(
+          this.points[this.maxVal - 1].y,
+          0,
+          800
+        );
+        for (var i = 1; i < this.maxVal; i++) {
+          stroke((i / this.maxVal) * 204.0 + 51);
+          strokeWeight(10);
+
+          line(
+            this.points[i - 1].x,
+            this.points[i - 1].y,
+            this.points[i].x,
+            this.points[i].y
+          );
+          noStroke();
+        }
+      }
     }
 
-    //############################################### SCORE SCREEN ######################################
+    class instructionObj {
+      constructor() {
+        this.x = 800;
+        this.instrTitle = new titleOjb(400 + this.x, 200, instrTitleImage);
+        this.brownian = [];
+        for (var i = 0; i < 10; i++) {
+          this.brownian.push(new brownianMotion());
+        }
+      }
+      display() {
+        rectMode(CENTER);
+        fill(53, 150, 181);
+        rect(400 + this.x, 400, 800, 800);
+        fill(254, 254, 223);
+        for (var i = 0; i < 10; i++) {
+          this.brownian[i].display();
+        }
+        textAlign(CENTER);
+        textFont(gameFont, 20);
+        textLeading(40);
+        text(content, 400 + this.x, 320);
+        textFont(gameFont, 10);
+        text("Press ` to go back", 400 + this.x, 700);
+        fill(255, 255, 255);
+        this.instrTitle.display();
+      }
+    }
+
+    //############################################### SCORE SCREEN ############################################
     class bigRocketObj extends rocketObj {
       constructor(x, y, img, direction) {
         super();
@@ -334,28 +558,28 @@ var sketchProc = function(processingInstance) {
         switch (this.travelPos) {
           case "left":
             if (!this.moving) {
-              this.move(400, 50);
+              this.move(-400, 50);
               this.travelPos = "top";
             }
             break;
 
           case "top":
             if (!this.moving) {
-              this.move(750, 400);
+              this.move(-50, 400);
               this.travelPos = "right";
             }
             break;
 
           case "right":
             if (!this.moving) {
-              this.move(400, 750);
+              this.move(-400, 750);
               this.travelPos = "bottom";
             }
             break;
 
           case "bottom":
             if (!this.moving) {
-              this.move(50, 400);
+              this.move(-750, 400);
               this.travelPos = "left";
             }
             break;
@@ -363,27 +587,35 @@ var sketchProc = function(processingInstance) {
       }
     }
     console.log(PFont.list());
+
     class scoreObj {
       constructor() {
-        this.bigRocket = new bigRocketObj(50, 400, rocketOneImage, "ccw");
         this.score = 0;
+        this.x = -800;
+        this.bigRocket = new bigRocketObj(
+          50 + this.x,
+          400,
+          rocketOneImage,
+          "ccw"
+        );
+        this.scoreTitle = new titleOjb(400 + this.x, 200, scoreTitleImage);
       }
 
       display(score) {
         this.score = score;
-        background(127, 158, 250);
+        rectMode(CENTER);
+        fill(127, 158, 250);
+        rect(-400, 400, 800, 800);
+        fill(254, 254, 223);
         this.bigRocket.travel();
-        textAlign(CENTER);
-        textLeading(10); //set line distance
-
+        textAlign(CENTER, CENTER);
         textFont(gameFont, 30);
-        text("Achivement", 400, 260);
-        textFont(gameFont, 20);
-        text("Player One", 400, 320);
-        text("Player Two", 400, 380);
-        text("Player Three", 400, 440);
+        text("Player One", 400 + this.x, 340);
+        text("Player Two", 400 + this.x, 400);
+        text("Player Three", 400 + this.x, 460);
         textFont(gameFont, 10);
-        text("Press ` to go back", 400, 700);
+        text("Press ` to go back", 400 + this.x, 700);
+        this.scoreTitle.display();
       }
     }
 
@@ -396,9 +628,12 @@ var sketchProc = function(processingInstance) {
         this.map = 1;
       }
     }
-
+    //############################################### CREATE VARIABLE ######################################
     var openScreen = new openObj();
     var scoreScreen = new scoreObj();
+    var instrScreen = new instructionObj();
+    var sectionPos = new PVector(0, 0);
+    //############################################### INPUT CONTROL ######################################
 
     var keyPressed = function() {
       if (keyCode === 192) {
@@ -409,19 +644,38 @@ var sketchProc = function(processingInstance) {
     var keyReleased = function() {};
 
     var mouseClicked = function() {
-      openScreen.show();
+      if (STATE.OPEN && !openScreen.startShow) {
+        openScreen.select(mouseX, mouseY, true);
+      }
     };
 
+    var mouseMoved = function() {
+      if (STATE.OPEN) {
+        openScreen.select(mouseX, mouseY, false);
+      }
+    };
+
+    //############################################### EXECUTION ######################################
     background(245, 222, 179);
     var draw = function() {
       if (STATE.OPEN) {
-        openScreen.display();
+        sectionPos.x < 0
+          ? (sectionPos.x += 4)
+          : sectionPos.x > 0
+          ? (sectionPos.x -= 4)
+          : 1;
       } else if (STATE.GAME) {
       } else if (STATE.INSTRUCTION) {
+        sectionPos.x > -800 ? (sectionPos.x -= 4) : 1;
       } else if (STATE.SCORE) {
-        scoreScreen.display(12);
-        openScreen.startShow = false;
+        sectionPos.x < 800 ? (sectionPos.x += 4) : 1;
       }
+      pushMatrix();
+      translate(sectionPos.x, sectionPos.y);
+      openScreen.display();
+      scoreScreen.display(12);
+      instrScreen.display();
+      popMatrix();
     };
 
     //######################################################################################################
