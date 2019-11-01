@@ -41,58 +41,59 @@ var sketchProc = function(processingInstance) {
     };
 
     //############################################### LOAD IMAGES ######################################
-    openTitleImage = loadImage("./images/gameTitle.png");
-    instrTitleImage = loadImage("./images/instrTitle.png");
-    scoreTitleImage = loadImage("./images/scoreTitle.png");
-    earthImage = loadImage("./images/earth.png");
+    url = ".";
+    openTitleImage = loadImage(url + "/images/gameTitle.png");
+    instrTitleImage = loadImage(url + "/images/instrTitle.png");
+    scoreTitleImage = loadImage(url + "/images/scoreTitle.png");
+    earthImage = loadImage(url + "/images/earth.png");
     ouchImage = [
-      loadImage("./images/ouch.png"),
-      loadImage("./images/ouch.png"),
-      loadImage("./images/ouch.png"),
-      loadImage("./images/ouch.png"),
-      loadImage("./images/ouch.png")
+      loadImage(url + "/images/ouch.png"),
+      loadImage(url + "/images/ouch.png"),
+      loadImage(url + "/images/ouch.png"),
+      loadImage(url + "/images/ouch.png"),
+      loadImage(url + "/images/ouch.png")
     ];
     rocketOneImage = [
-      loadImage("./images/r1f1.png"),
-      loadImage("./images/r1f2.png"),
-      loadImage("./images/r1f3.png"),
-      loadImage("./images/r1f4.png"),
-      loadImage("./images/r1f5.png")
+      loadImage(url + "/images/r1f1.png"),
+      loadImage(url + "/images/r1f2.png"),
+      loadImage(url + "/images/r1f3.png"),
+      loadImage(url + "/images/r1f4.png"),
+      loadImage(url + "/images/r1f5.png")
     ];
     rocketTwoImage = [
-      loadImage("./images/r2f1.png"),
-      loadImage("./images/r2f2.png"),
-      loadImage("./images/r2f3.png"),
-      loadImage("./images/r2f4.png"),
-      loadImage("./images/r2f5.png")
+      loadImage(url + "/images/r2f1.png"),
+      loadImage(url + "/images/r2f2.png"),
+      loadImage(url + "/images/r2f3.png"),
+      loadImage(url + "/images/r2f4.png"),
+      loadImage(url + "/images/r2f5.png")
     ];
     rocketThreeImage = [
-      loadImage("./images/r3f1.png"),
-      loadImage("./images/r3f2.png"),
-      loadImage("./images/r3f3.png"),
-      loadImage("./images/r3f4.png"),
-      loadImage("./images/r3f5.png")
+      loadImage(url + "/images/r3f1.png"),
+      loadImage(url + "/images/r3f2.png"),
+      loadImage(url + "/images/r3f3.png"),
+      loadImage(url + "/images/r3f4.png"),
+      loadImage(url + "/images/r3f5.png")
     ];
     rocketFourImage = [
-      loadImage("./images/r4f1.png"),
-      loadImage("./images/r4f2.png"),
-      loadImage("./images/r4f3.png"),
-      loadImage("./images/r4f4.png"),
-      loadImage("./images/r4f5.png")
+      loadImage(url + "/images/r4f1.png"),
+      loadImage(url + "/images/r4f2.png"),
+      loadImage(url + "/images/r4f3.png"),
+      loadImage(url + "/images/r4f4.png"),
+      loadImage(url + "/images/r4f5.png")
     ];
     rocketFiveImage = [
-      loadImage("./images/r5f1.png"),
-      loadImage("./images/r5f2.png"),
-      loadImage("./images/r5f3.png"),
-      loadImage("./images/r5f4.png"),
-      loadImage("./images/r5f5.png")
+      loadImage(url + "/images/r5f1.png"),
+      loadImage(url + "/images/r5f2.png"),
+      loadImage(url + "/images/r5f3.png"),
+      loadImage(url + "/images/r5f4.png"),
+      loadImage(url + "/images/r5f5.png")
     ];
     rocketSixImage = [
-      loadImage("./images/r6f1.png"),
-      loadImage("./images/r6f2.png"),
-      loadImage("./images/r6f3.png"),
-      loadImage("./images/r6f4.png"),
-      loadImage("./images/r6f5.png")
+      loadImage(url + "/images/r6f1.png"),
+      loadImage(url + "/images/r6f2.png"),
+      loadImage(url + "/images/r6f3.png"),
+      loadImage(url + "/images/r6f4.png"),
+      loadImage(url + "/images/r6f5.png")
     ];
 
     //############################################### OPENING SCREEN ######################################
@@ -688,4 +689,3 @@ var sketchProc = function(processingInstance) {
     //######################################################################################################
   }
 };
-function screenShake() {}
