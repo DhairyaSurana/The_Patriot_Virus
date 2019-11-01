@@ -12,7 +12,7 @@ var sketchProc = function(processingInstance) {
       GAME: false,
       INSTRUCTION: false,
       SCORE: false,
-      ACHIVEMENT: false
+      ACHIEVEMENT: false
     };
 
     var changePage = function changePage(page) {
@@ -20,7 +20,7 @@ var sketchProc = function(processingInstance) {
       STATE.GAME = false;
       STATE.INSTRUCTION = false;
       STATE.SCORE = false;
-      STATE.ACHIVEMENT = false;
+      STATE.ACHIEVEMENT = false;
       switch (page) {
         case "OPEN":
           STATE.OPEN = true;
@@ -34,8 +34,8 @@ var sketchProc = function(processingInstance) {
         case "SCORE":
           STATE.SCORE = true;
           break;
-        case "ACHIVEMENT":
-          STATE.ACHIVEMENT = true;
+        case "ACHIEVEMENT":
+          STATE.ACHIEVEMENT = true;
           break;
       }
     };
@@ -334,7 +334,7 @@ var sketchProc = function(processingInstance) {
           PLAY: false,
           INSTRUCTION: false,
           SCORE: false,
-          ACHIVEMENT: false
+          ACHIEVEMENT: false
         };
       }
 
@@ -416,7 +416,7 @@ var sketchProc = function(processingInstance) {
           rect(400, 440, 500, 50, 30);
         } else if (this.mouseOn.SCORE) {
           rect(400, 520, 500, 50, 30);
-        } else if (this.mouseOn.ACHIVEMENT) {
+        } else if (this.mouseOn.ACHIEVEMENT) {
           rect(400, 600, 500, 50, 30);
         }
         fill(255, 255, 255);
@@ -426,7 +426,7 @@ var sketchProc = function(processingInstance) {
         text("START GAME", 400, 360);
         text("HOW TO PLAY", 400, 440);
         text("SCORE", 400, 520);
-        text("ACHIVEMENT", 400, 600);
+        text("ACHIEVEMENT", 400, 600);
         fill(39, 36, 89, 150);
         textSize(15);
         text("Represented By Hung Tran & Dhairya Surana", 400, 280);
@@ -437,7 +437,7 @@ var sketchProc = function(processingInstance) {
         this.mouseOn.PLAY = false;
         this.mouseOn.INSTRUCTION = false;
         this.mouseOn.SCORE = false;
-        this.mouseOn.ACHIVEMENT = false;
+        this.mouseOn.ACHIEVEMENT = false;
 
         if (Math.abs(x - 400) < 100 && Math.abs(y - 360) < 20) {
           this.mouseOn.PLAY = true;
@@ -449,8 +449,8 @@ var sketchProc = function(processingInstance) {
           this.mouseOn.SCORE = true;
           clicked === true ? changePage("SCORE") : 1;
         } else if (Math.abs(x - 400) < 100 && Math.abs(y - 600) < 20) {
-          this.mouseOn.ACHIVEMENT = true;
-          clicked === true ? changePage("ACHIVEMENT") : 1;
+          this.mouseOn.ACHIEVEMENT = true;
+          clicked === true ? changePage("ACHIEVEMENT") : 1;
         }
       }
     }
