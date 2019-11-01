@@ -41,7 +41,9 @@ var sketchProc = function(processingInstance) {
     };
 
     //############################################### LOAD IMAGES ######################################
-    gameTitleImage = loadImage("./images/gameTitle.png");
+    openTitleImage = loadImage("./images/gameTitle.png");
+    instrTitleImage = loadImage("./images/instrTitle.png");
+    scoreTitleImage = loadImage("./images/scoreTitle.png");
     earthImage = loadImage("./images/earth.png");
     ouchImage = [
       loadImage("./images/ouch.png"),
@@ -323,7 +325,7 @@ var sketchProc = function(processingInstance) {
         this.rocketFive = new rocketObj(500, 50, rocketFiveImage, "cw");
         this.rocketSix = new rocketObj(100, 750, rocketSixImage, "cw");
         this.earth = new earthObj(400, 400, earthImage);
-        this.gameTitle = new titleOjb(400, 200, gameTitleImage);
+        this.gameTitle = new titleOjb(400, 200, openTitleImage);
         this.startShow = false;
         this.currFrame = 0;
         this.color = { r: 250, g: 185, b: 167 };
@@ -448,8 +450,88 @@ var sketchProc = function(processingInstance) {
       }
     }
     //############################################### INSTRUCTION SCREEN ######################################
+    var content =
+      "Feed virus instruction to MIPS architecture " +
+      "\nprocessor that control the rockets " +
+      "to destry them." +
+      "\nMove Left: A" +
+      "\nMove Right: D" +
+      "\nJump: Space Bar" +
+      "\nAttack: Right Click" +
+      "\nExit: `";
 
-    //############################################### SCORE SCREEN ######################################
+    //CITATION: brownianMotion is initially comes from
+    //http://processingjs.org/learning/topic/brownian/
+    class brownianMotion {
+      constructor() {
+        this.maxVal = 2;
+        this.points = [];
+        for (var i = 0; i < this.maxVal; i++) {
+          this.points.push(new PVector(400 + 800, 400));
+        }
+      }
+
+      display() {
+        for (var i = 1; i < this.maxVal; i++) {
+          this.points[i - 1].x = this.points[i].x;
+          this.points[i - 1].y = this.points[i].y;
+        }
+        this.points[this.maxVal - 1].x += random(-100, 100);
+        this.points[this.maxVal - 1].y += random(-100, 100);
+        this.points[this.maxVal - 1].x = constrain(
+          this.points[this.maxVal - 1].x,
+          850,
+          1600
+        );
+        this.points[this.maxVal - 1].y = constrain(
+          this.points[this.maxVal - 1].y,
+          0,
+          800
+        );
+        for (var i = 1; i < this.maxVal; i++) {
+          stroke((i / this.maxVal) * 204.0 + 51);
+          strokeWeight(10);
+
+          line(
+            this.points[i - 1].x,
+            this.points[i - 1].y,
+            this.points[i].x,
+            this.points[i].y
+          );
+          noStroke();
+        }
+      }
+    }
+
+    class instructionObj {
+      constructor() {
+        this.x = 800;
+        this.instrTitle = new titleOjb(400 + this.x, 200, instrTitleImage);
+        this.brownian = [];
+        for (var i = 0; i < 10; i++) {
+          this.brownian.push(new brownianMotion());
+        }
+      }
+      display() {
+        rectMode(CENTER);
+        fill(53, 150, 181);
+        rect(400 + this.x, 400, 800, 800);
+        fill(254, 254, 223);
+        for (var i = 0; i < 10; i++) {
+          this.brownian[i].display();
+        }
+        textAlign(CENTER);
+        textFont(gameFont, 20);
+        textLeading(40);
+        text(content, 400 + this.x, 320);
+        textFont(gameFont, 10);
+        text("Press ` to go back", 400 + this.x, 700);
+        fill(255, 255, 255);
+        this.instrTitle.display();
+      }
+    }
+
+    //############################################### SCORE SCREEN ############################################
     class bigRocketObj extends rocketObj {
       constructor(x, y, img, direction) {
         super();
@@ -504,8 +586,15 @@ var sketchProc = function(processingInstance) {
 
     class scoreObj {
       constructor() {
-        this.bigRocket = new bigRocketObj(50 - 800, 400, rocketOneImage, "ccw");
         this.score = 0;
+        this.x = -800;
+        this.bigRocket = new bigRocketObj(
+          50 + this.x,
+          400,
+          rocketOneImage,
+          "ccw"
+        );
+        this.scoreTitle = new titleOjb(400 + this.x, 200, scoreTitleImage);
       }
 
       display(score) {
@@ -513,17 +602,16 @@ var sketchProc = function(processingInstance) {
         rectMode(CENTER);
         fill(127, 158, 250);
         rect(-400, 400, 800, 800);
-        fill(255, 255, 255);
+        fill(254, 254, 223);
         this.bigRocket.travel();
         textAlign(CENTER, CENTER);
         textFont(gameFont, 30);
-        text("WINNERS", 400 - 800, 260);
-        textFont(gameFont, 20);
-        text("Player One", 400 - 800, 320);
-        text("Player Two", 400 - 800, 380);
-        text("Player Three", 400 - 800, 440);
+        text("Player One", 400 + this.x, 340);
+        text("Player Two", 400 + this.x, 400);
+        text("Player Three", 400 + this.x, 460);
         textFont(gameFont, 10);
-        text("Press ` to go back", 400 - 800, 700);
+        text("Press ` to go back", 400 + this.x, 700);
+        this.scoreTitle.display();
       }
     }
 
@@ -539,9 +627,8 @@ var sketchProc = function(processingInstance) {
     //############################################### CREATE VARIABLE ######################################
     var openScreen = new openObj();
     var scoreScreen = new scoreObj();
+    var instrScreen = new instructionObj();
     var sectionPos = new PVector(0, 0);
-
-
     //############################################### INPUT CONTROL ######################################
 
     var keyPressed = function() {
@@ -568,17 +655,22 @@ var sketchProc = function(processingInstance) {
     background(245, 222, 179);
     var draw = function() {
       if (STATE.OPEN) {
-        sectionPos.x < 0 ? sectionPos.x++ :
-        sectionPos.x > 0 ? sectionPos.x-- : 1;
+        sectionPos.x < 0
+          ? (sectionPos.x += 4)
+          : sectionPos.x > 0
+          ? (sectionPos.x -= 4)
+          : 1;
       } else if (STATE.GAME) {
       } else if (STATE.INSTRUCTION) {
+        sectionPos.x > -800 ? (sectionPos.x -= 4) : 1;
       } else if (STATE.SCORE) {
-        sectionPos.x < 800 ? sectionPos.x++ : 1;
+        sectionPos.x < 800 ? (sectionPos.x += 4) : 1;
       }
       pushMatrix();
       translate(sectionPos.x, sectionPos.y);
       openScreen.display();
       scoreScreen.display(12);
+      instrScreen.display();
       popMatrix();
     };
 
