@@ -100,6 +100,13 @@ var sketchProc = function (processingInstance) {
       loadImage(url + "/images/r6f5.png")
     ];
 
+
+    //############################################### LOAD SOUNDS ######################################
+    
+    rocketSound = new Audio("./sounds/rocketSound.mp3");
+    introSoundtrack = new Audio("./sounds/introSoundtrack.mp3");
+    menuSoundtrack = new Audio("./sounds/mainMenuSoundtrack.mp3");
+
     //############################################### OPENING SCREEN ######################################
     const IMAGESIZE = 64;
     const ROTATESPEED = 0.03;
@@ -169,9 +176,11 @@ var sketchProc = function (processingInstance) {
       }
 
       move(desX, desY) {
+
         if (this.moving) {
           return;
         }
+        
         this.moving = true;
         this.nextPos.set(desX, desY);
         this.nextAngle =
@@ -342,6 +351,7 @@ var sketchProc = function (processingInstance) {
           SCORE: false,
           ACHIVEMENT: false
         };
+        this.clicked = false;
       }
 
       reset() {
@@ -382,6 +392,11 @@ var sketchProc = function (processingInstance) {
       }
 
       show() {
+
+        menuSoundtrack.pause();
+        menuSoundtrack.currentTime = 0;
+        introSoundtrack.play();
+
         if (this.startShow) {
           return;
         }
@@ -437,6 +452,10 @@ var sketchProc = function (processingInstance) {
         textSize(15);
         text("Represented By Hung Tran & Dhairya Surana", 400, 280);
 
+        if(!this.clicked) {
+          fill(255, 0, 0);
+          text("(Click for sound)", 400, 310);
+        }
       }
 
       select(x, y, clicked) {
@@ -612,6 +631,7 @@ var sketchProc = function (processingInstance) {
       }
 
       display(score) {
+
         this.score = score;
         rectMode(CENTER);
         fill(127, 158, 250);
@@ -778,7 +798,7 @@ var sketchProc = function (processingInstance) {
       }
     }
 
-    //############################################### CREATE VARIABLE ######################################
+    //############################################### CREATE VARIABLES ######################################
     var openScreen = new openObj();
     var scoreScreen = new scoreObj();
     var instrScreen = new instructionObj();
@@ -795,9 +815,16 @@ var sketchProc = function (processingInstance) {
     var keyReleased = function () { };
 
     var mouseClicked = function () {
+
       if (STATE.OPEN && !openScreen.startShow) {
         openScreen.select(mouseX, mouseY, true);
       }
+
+      if (!openScreen.startShow) {
+        menuSoundtrack.play();
+        openScreen.clicked = true;
+      }
+    
     };
 
     var mouseMoved = function () {
@@ -821,14 +848,19 @@ var sketchProc = function (processingInstance) {
           : sectionPos.y > 0
             ? (sectionPos.y -= 4)
             : 1;
+
+        if(sectionPos.x == 0 && sectionPos.y == 0) {
+          rocketSound.pause();
+          rocketSound.currentTime = 0;
+        }
       } else if (STATE.GAME) {
       } else if (STATE.INSTRUCTION) {
         sectionPos.x > -800 ? (sectionPos.x -= 4) : 1;
       } else if (STATE.SCORE) {
         sectionPos.x < 800 ? (sectionPos.x += 4) : 1;
+        rocketSound.play();
       } else if (STATE.ACHIVEMENT) {
         sectionPos.y > -800 ? (sectionPos.y -= 4) : 1;
-
       }
 
       if (!STATE.GAME) {
