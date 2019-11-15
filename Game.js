@@ -962,11 +962,11 @@ var sketchProc = function (processingInstance) {
 
         this.countDown();
 
-        if(this.current_sec > 10) {
+        if(this.current_sec > this.limit * (2/3)) {
           fill(0, 255, 0);
         }
 
-        else if(this.current_sec > 5) {
+        else if(this.current_sec > this.limit * (1/3)) {
           fill(255, 255, 0);
         }
 
@@ -990,15 +990,15 @@ var sketchProc = function (processingInstance) {
 
       constructor() {
         
-        this.question_box = new textBoxObj("I am the beginning of eternity and the end of time. What am I?", 400, 150, 700, 150, true);
+        this.question_box = new textBoxObj("Calculate the following: 4A6 + 1B3 =", 400, 150, 700, 150, true);
 
-        this.top_left_box = new textBoxObj("THE LETTER E", 200, 350, 300, 100, false);
-        this.top_right_box = new textBoxObj("DESTINY", 600, 350, 300, 100, false);
-        this.bottom_left_box = new textBoxObj("GOD", 200, 550, 300, 100, false);
-        this.bottom_right_box = new textBoxObj("IDK", 600, 550, 300, 100, false);
+        this.top_left_box = new textBoxObj("659", 200, 350, 300, 100, false);
+        this.top_right_box = new textBoxObj("123", 600, 350, 300, 100, false);
+        this.bottom_left_box = new textBoxObj("7C2", 200, 550, 300, 100, false);
+        this.bottom_right_box = new textBoxObj("H45", 600, 550, 300, 100, false);
 
         this.answer = "";
-        this.actual_answer = this.top_left_box.str;
+        this.actual_answer = "659";
 
         this.is_correct = false;
         this.is_clicked = false;
@@ -1072,12 +1072,12 @@ var sketchProc = function (processingInstance) {
 
         constructor() {
           
-          this.timer = new timerObj(20, 700, 50);
-          this.question_box = new textBoxObj("Calculate the following: 4A6 + 1B3", 400, 150, 700, 150, true);
+          this.timer = new timerObj(10, 700, 50);
+          this.question_box = new textBoxObj("Calculate the following: 410 + 113", 400, 150, 700, 150, true);
           this.input_box = new userInputBoxObj(400, 400, 700, 150);
           this.answer = "";
 
-          this.actual_answer = "659";
+          this.actual_answer = "523";
 
           this.is_correct = false;
           this.is_enter_pressed = false;
@@ -1183,7 +1183,13 @@ var sketchProc = function (processingInstance) {
         }
 
         else if(additionMiniGameScreen.getTime() > 0 && !additionMiniGameScreen.getEnterStatus()){
-          userInput += key.toString();
+          if(key.toString() == "0" || key.toString() == "1" || key.toString() == "3" || key.toString() == "4" || 
+             key.toString() == "5" || key.toString() == "6" || key.toString() == "7" || key.toString() == "8" ||
+             key.toString() == "9") {
+          
+              userInput += key.toString();
+          }
+
           additionMiniGameScreen.storeCurrentInput(userInput);
         }
       }
