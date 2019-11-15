@@ -683,7 +683,7 @@ var sketchProc = function (processingInstance) {
 
     //############################################### GAME SCREEN ######################################
 
-    class playerOjb { }
+    class playerObj { }
 
     class gameOjb {
       constructor() {
@@ -1183,7 +1183,7 @@ var sketchProc = function (processingInstance) {
         }
 
         else if(additionMiniGameScreen.getTime() > 0 && !additionMiniGameScreen.getEnterStatus()){
-          if(key.toString() == "0" || key.toString() == "1" || key.toString() == "3" || key.toString() == "4" || 
+          if(key.toString() == "0" || key.toString() == "1" || key.toString() == "2" || key.toString() == "3" || key.toString() == "4" || 
              key.toString() == "5" || key.toString() == "6" || key.toString() == "7" || key.toString() == "8" ||
              key.toString() == "9") {
           
