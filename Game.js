@@ -10,6 +10,8 @@ var sketchProc = function (processingInstance) {
     STATE = {
       OPEN: true,
       GAME: false,
+      MULTIPLECHOICEMINIGAME: false,
+      ADDITIONMINIGAME: false, 
       INSTRUCTION: false,
       SCORE: false,
       ACHIVEMENT: false
@@ -18,6 +20,8 @@ var sketchProc = function (processingInstance) {
     var changePage = function changePage(page) {
       STATE.OPEN = false;
       STATE.GAME = false;
+      STATE.MULTIPLECHOICEMINIGAME = false;
+      STATE.ADDITIONMINIGAME = false;
       STATE.INSTRUCTION = false;
       STATE.SCORE = false;
       STATE.ACHIVEMENT = false;
@@ -27,6 +31,12 @@ var sketchProc = function (processingInstance) {
           break;
         case "GAME":
           STATE.GAME = true;
+          break;
+        case "MULTIPLECHOICEMINIGAME":
+          STATE.MULTIPLECHOICEMINIGAME = true;
+          break;
+        case "ADDITIONMINIGAME":
+          STATE.ADDITIONMINIGAME = true;
           break;
         case "INSTRUCTION":
           STATE.INSTRUCTION = true;
@@ -50,6 +60,10 @@ var sketchProc = function (processingInstance) {
     scoreTitleImage = loadImage(url + "/images/scoreTitle.png");
     achievementTitleImage = loadImage(url + "/images/achievementTitle.png");
     earthImage = loadImage(url + "/images/earth.png");
+
+    miniGameBackgroundImage1 = loadImage(url + "/images/digitalBackground.png");
+    miniGameBackgroundImage2 = loadImage(url + "/images/digitalBackground2.png");
+
     ouchImage = [
       loadImage(url + "/images/ouch.png"),
       loadImage(url + "/images/ouch.png"),
@@ -347,6 +361,8 @@ var sketchProc = function (processingInstance) {
         this.color = { r: 250, g: 185, b: 167 };
         this.mouseOn = {
           PLAY: false,
+          PLAYMULTIPLECHOICE: false,                // TEMPORARY
+          PLAYADDITION: false,                      // TEMPORARY
           INSTRUCTION: false,
           SCORE: false,
           ACHIVEMENT: false
@@ -439,6 +455,10 @@ var sketchProc = function (processingInstance) {
           rect(400, 520, 500, 50, 30);
         } else if (this.mouseOn.ACHIVEMENT) {
           rect(400, 600, 500, 50, 30);
+        } else if (this.mouseOn.PLAYMULTIPLECHOICE) {             // TEMPORARY
+          rect(400, 680, 650, 50, 30);
+        } else if (this.mouseOn.PLAYADDITION) {                   // TEMPORARY
+          rect(400, 760, 500, 50, 30);  
         }
         fill(255, 255, 255);
         textFont(gameFont, 30);
@@ -448,6 +468,8 @@ var sketchProc = function (processingInstance) {
         text("HOW TO PLAY", 400, 440);
         text("SCORE", 400, 520);
         text("ACHIEVEMENTS", 400, 600);
+        text("START MULTIPLE CHOICE MINI GAME", 400, 680);                        // TEMPORARY 
+        text("START ADDITION MINI GAME", 400, 760);                               // TEMPORARY
         fill(39, 36, 89, 150);
         textSize(15);
         text("Represented By Hung Tran & Dhairya Surana", 400, 280);
@@ -463,6 +485,8 @@ var sketchProc = function (processingInstance) {
         this.mouseOn.INSTRUCTION = false;
         this.mouseOn.SCORE = false;
         this.mouseOn.ACHIVEMENT = false;
+        this.mouseOn.PLAYMULTIPLECHOICE = false;                          // TEMPORARY
+        this.mouseOn.PLAYADDITION = false;                                // TEMPORARY
 
         if (Math.abs(x - 400) < 100 && Math.abs(y - 360) < 20) {
           this.mouseOn.PLAY = true;
@@ -476,6 +500,14 @@ var sketchProc = function (processingInstance) {
         } else if (Math.abs(x - 400) < 100 && Math.abs(y - 600) < 20) {
           this.mouseOn.ACHIVEMENT = true;
           clicked === true ? changePage("ACHIVEMENT") : 1;
+        }
+        else if (Math.abs(x - 400) < 100 && Math.abs(y - 680) < 20) {             // TEMPORARY
+          this.mouseOn.PLAYMULTIPLECHOICE = true;
+          clicked === true ? changePage("MULTIPLECHOICEMINIGAME") : 1;   
+        }
+        else if (Math.abs(x - 400) < 100 && Math.abs(y - 760) < 20) {             // TEMPORARY
+          this.mouseOn.PLAYADDITION = true;
+          clicked === true ? changePage("ADDITIONMINIGAME") : 1;
         }
       }
     }
@@ -798,17 +830,362 @@ var sketchProc = function (processingInstance) {
       }
     }
 
+    //############################################### MINI GAME SCREENS  ######################################
+
+    //                                       _______ TEXT BOX OBJECT__________
+    class textBoxObj {
+
+      constructor(str, x, y, w, h, is_question) {
+
+        this.str = str;
+
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+
+        this.is_question = is_question;
+        this.is_clicked = false;
+
+      }
+
+      getX() {
+        return this.x;
+      }
+
+      getY() {
+        return this.y;
+      }
+
+      getWidth() {
+        return this.w;
+      }
+
+      getHeight() {
+        return this.h;
+      }
+
+      display() {
+
+        if(this.is_question == false
+          && mouseX >= this.x && mouseX <= this.x + this.w && 
+          mouseY >= this.y && mouseY <= this.y + this.h) {
+          fill(155, 155, 0);
+        }
+        else {
+          fill(0, 0, 0);
+        }
+
+        if(!this.is_question && this.is_clicked) {
+          fill(255, 0, 0);
+        }
+
+        rect(this.x, this.y, this.w, this.h);
+
+        fill(255, 255, 255);
+
+        textFont(gameFont, 20);
+        text(this.str, this.x, this.y);
+        
+      }
+
+      reset() {
+        this.is_clicked = false;
+      }
+    }
+
+    //                                       _______ USER INPUT BOX OBJECT__________
+    class userInputBoxObj { 
+
+      constructor(x, y, w, h) {
+
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+        this.str = str;
+
+        this.input = "";
+      }
+
+      storeInput(input) {
+        this.input = input;
+      } 
+
+      display(time) {
+
+        rect(this.x, this.y, this.w, this.h);
+
+        fill(0, 0, 0);
+        text("Enter: " + this.input, this.x, this.y);
+
+      }
+
+      reset() {
+        this.input = "";
+      }
+    }
+
+    //                                       _______ TIMER OBJECT__________
+    class timerObj {
+
+      constructor(limit, x, y) {
+
+        this.limit = limit;
+        this.current_sec = this.limit;
+
+        this.x = x;
+        this.y = y;
+
+        this.is_paused = false;
+
+      }
+
+      getTime() {
+
+        return this.current_sec;
+      }
+
+      pauseTime() {
+        this.is_paused = true;
+      }
+
+      countDown() {
+
+        if(this.current_sec > 0 && !this.is_paused) {
+          this.current_sec-=(1/60);
+        }
+        
+      }
+
+      display() {
+
+        this.countDown();
+
+        if(this.current_sec > 10) {
+          fill(0, 255, 0);
+        }
+
+        else if(this.current_sec > 5) {
+          fill(255, 255, 0);
+        }
+
+        else {
+          fill(255, 0, 0);
+        }
+
+        textSize(50);
+        text(this.current_sec, this.x, this.y);
+        
+      }
+
+      reset() {
+        this.current_sec = this.limit;
+        this.is_paused = false;
+      }
+    }
+
+    //                                       _______ MULITPLE CHOICE MINI GAME OBJECT__________
+    class multipleChoiceMiniGameObj {
+
+      constructor() {
+        
+        this.question_box = new textBoxObj("I am the beginning of eternity and the end of time. What am I?", 400, 150, 700, 150, true);
+
+        this.top_left_box = new textBoxObj("THE LETTER E", 200, 350, 300, 100, false);
+        this.top_right_box = new textBoxObj("DESTINY", 600, 350, 300, 100, false);
+        this.bottom_left_box = new textBoxObj("GOD", 200, 550, 300, 100, false);
+        this.bottom_right_box = new textBoxObj("IDK", 600, 550, 300, 100, false);
+
+        this.answer = "";
+        this.actual_answer = this.top_left_box.str;
+
+        this.is_correct = false;
+        this.is_clicked = false;
+        
+      }
+
+      getClickStatus() {
+        return this.is_clicked;
+      }
+
+      setClickStatus() {
+        this.is_clicked = true;
+      }
+
+      selectOption(text_box) {
+        this.answer = text_box.str;
+        text_box.is_clicked = true;
+        this.is_correct = (this.answer == this.actual_answer) ? true : false;
+          
+      }
+
+      display() {
+
+        image(miniGameBackgroundImage1, 400, 400, 800, 800);
+        
+        this.question_box.display();
+        
+        this.top_left_box.display();
+        this.top_right_box.display();
+        this.bottom_left_box.display();
+        this.bottom_right_box.display();
+
+        if(this.is_clicked) {
+          textFont(gameFont, 20);
+          if(this.is_correct) {
+            fill(0, 255, 0);
+            text("CORRECT", 400, 650);
+          }
+          else {
+            fill(255, 0, 0);
+            text("WRONG", 400, 650);
+          }
+        }
+
+        fill(255, 255, 255);
+        textFont(gameFont, 10);
+        text("Press ` to go back", 400, 700);
+
+      }
+
+      reset() {
+
+        this.selected_box = null;
+        this.is_clicked = false;
+        this.is_correct = false;
+
+        this.top_left_box.reset();
+        this.top_right_box.reset();
+        this.bottom_left_box.reset();
+        this.bottom_right_box.reset();
+
+        this.answer = "";
+
+      }
+
+    
+    }
+
+    //                                       _______ ADDITION MINI GAME OBJECT__________
+    class additionMiniGameObj {
+
+        constructor() {
+          
+          this.timer = new timerObj(20, 700, 50);
+          this.question_box = new textBoxObj("Calculate the following: 4A6 + 1B3", 400, 150, 700, 150, true);
+          this.input_box = new userInputBoxObj(400, 400, 700, 150);
+          this.answer = "";
+
+          this.actual_answer = "659";
+
+          this.is_correct = false;
+          this.is_enter_pressed = false;
+          
+        }
+
+        getTime() {
+          return this.timer.getTime();
+        }
+
+        getEnterStatus() {
+          return this.is_enter_pressed;
+        }
+        setEnterStatus() {
+          this.is_enter_pressed = true;
+        }
+
+        storeCurrentInput(input) {
+          this.input_box.storeInput(input);
+        }
+
+        checkActualAnswer() {
+          this.answer = this.input_box.input;
+          this.is_correct = (this.answer == this.actual_answer) ? true : false;
+        }
+  
+        display() {
+          
+          image(miniGameBackgroundImage2, 400, 400, 800, 800);
+          
+          this.question_box.display();
+          this.input_box.display(this.timer.getTime());
+
+          this.timer.display();
+
+          fill(255, 255, 255);
+          textFont(gameFont, 10);
+          text("Press ` to go back", 400, 700);
+
+          if(this.is_enter_pressed) {
+
+            this.timer.pauseTime();
+
+            textFont(gameFont, 20);
+            if(this.is_correct) {
+              fill(0, 255, 0);
+              text("CORRECT", 400, 650);
+            }
+            else {
+              fill(255, 0, 0);
+              text("WRONG", 400, 650);
+            }
+          }
+  
+        }
+
+        reset() {
+          this.timer.reset();
+          this.input_box.reset();
+          this.is_correct = false;
+          this.is_enter_pressed = false;
+        }
+  
+      
+    }
+  
     //############################################### CREATE VARIABLES ######################################
     var openScreen = new openObj();
     var scoreScreen = new scoreObj();
     var instrScreen = new instructionObj();
     var achievementScreen = new achievementObj();
+
+    var multipleChoiceMiniGameScreen = new multipleChoiceMiniGameObj();
+    var additionMiniGameScreen = new additionMiniGameObj();
+
+    var userInput = "";
+
     var sectionPos = new PVector(0, 0);
     //############################################### INPUT CONTROL ######################################
 
     var keyPressed = function () {
+
       if (keyCode === 192) {
+
+        if(STATE.ADDITIONMINIGAME) {
+          additionMiniGameScreen.reset();
+          userInput = "";
+        }
+
+        if(STATE.MULTIPLECHOICEMINIGAME) {
+          multipleChoiceMiniGameScreen.reset();
+        }
+
         changePage("OPEN");
+        
+      }
+
+      if(STATE.ADDITIONMINIGAME) {
+
+        if(key.toString() == "\n") {
+          additionMiniGameScreen.setEnterStatus();
+          additionMiniGameScreen.checkActualAnswer();
+        }
+
+        else if(additionMiniGameScreen.getTime() > 0 && !additionMiniGameScreen.getEnterStatus()){
+          userInput += key.toString();
+          additionMiniGameScreen.storeCurrentInput(userInput);
+        }
       }
     };
 
@@ -824,10 +1201,52 @@ var sketchProc = function (processingInstance) {
         menuSoundtrack.play();
         openScreen.clicked = true;
       }
+
+      if (STATE.MULTIPLECHOICEMINIGAME && !multipleChoiceMiniGameScreen.getClickStatus()) {
+
+        var top_left_box = multipleChoiceMiniGameScreen.top_left_box;
+        var top_right_box = multipleChoiceMiniGameScreen.top_right_box;
+        var bottom_left_box = multipleChoiceMiniGameScreen.bottom_left_box;
+        var bottom_right_box = multipleChoiceMiniGameScreen.bottom_right_box;
+
+        if(mouseX >= top_left_box.getX() && mouseX <= top_left_box.getX() + top_left_box.getWidth() &&
+           mouseY >= top_left_box.getY() && mouseY <= top_left_box.getY() + top_left_box.getHeight()) {
+
+            multipleChoiceMiniGameScreen.selectOption(top_left_box);
+            multipleChoiceMiniGameScreen.setClickStatus();
+        }
+
+        if(mouseX >= top_right_box.getX() && mouseX <= top_right_box.getX() + top_right_box.getWidth() &&
+          mouseY >= top_right_box.getY() && mouseY <= top_right_box.getY() + top_right_box.getHeight()) {
+
+            multipleChoiceMiniGameScreen.selectOption(top_right_box);
+            multipleChoiceMiniGameScreen.setClickStatus();
+          
+        }
+
+        if(mouseX >= bottom_left_box.getX() && mouseX <= bottom_left_box.getX() + bottom_left_box.getWidth() &&
+          mouseY >= bottom_left_box.getY() && mouseY <= bottom_left_box.getY() + bottom_left_box.getHeight()) {
+           
+            multipleChoiceMiniGameScreen.selectOption(bottom_left_box);
+            multipleChoiceMiniGameScreen.setClickStatus();           
+
+        }
+
+        if(mouseX >= bottom_right_box.getX() && mouseX <= bottom_right_box.getX() + bottom_right_box.getWidth() &&
+          mouseY >= bottom_right_box.getY() && mouseY <= bottom_right_box.getY() + bottom_right_box.getHeight()) {
+
+            multipleChoiceMiniGameScreen.selectOption(bottom_right_box);
+            multipleChoiceMiniGameScreen.setClickStatus();
+        }
+
+
+
+
+      }
     
     };
 
-    var mouseMoved = function () {
+    var mouseMoved = function() {
       if (STATE.OPEN) {
         openScreen.select(mouseX, mouseY, false);
       }
@@ -863,16 +1282,23 @@ var sketchProc = function (processingInstance) {
         sectionPos.y > -800 ? (sectionPos.y -= 4) : 1;
       }
 
-      if (!STATE.GAME) {
+      if (!STATE.GAME && !STATE.MULTIPLECHOICEMINIGAME && !STATE.ADDITIONMINIGAME) {
         pushMatrix();
         translate(sectionPos.x, sectionPos.y);
         openScreen.display();
         scoreScreen.display(12);
         instrScreen.display();
-        achievementScreen.display();
+        achievementScreen.display();                      
         popMatrix();
       }
 
+      if(STATE.MULTIPLECHOICEMINIGAME) {
+        multipleChoiceMiniGameScreen.display();                         // TEMPORARY
+      }
+      if(STATE.ADDITIONMINIGAME) {
+        additionMiniGameScreen.display();                               // TEMPORARY
+      }
+      
     };
 
     //######################################################################################################
