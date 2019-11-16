@@ -114,6 +114,19 @@ var sketchProc = function (processingInstance) {
       loadImage(url + "/images/r6f5.png")
     ];
 
+    droidStandImage = [
+      loadImage(url + "/images/droidStanding1.png"),
+      loadImage(url + "/images/droidStanding2.png"),
+      loadImage(url + "/images/droidStanding3.png"),
+      loadImage(url + "/images/droidStanding4.png")
+    ]
+
+    droidPatrolImage = [
+      loadImage(url + "/images/droidPatrolling1.png"),
+      loadImage(url + "/images/droidPatrolling2.png"),
+      loadImage(url + "/images/droidPatrolling3.png"),
+      loadImage(url + "/images/droidPatrolling4.png")
+    ];
 
     //############################################### LOAD SOUNDS ######################################
     
@@ -683,6 +696,100 @@ var sketchProc = function (processingInstance) {
 
     //############################################### GAME SCREEN ######################################
 
+    class droidObj {
+  
+      constructor(x, y, img, direction) {
+
+        this.pos = new PVector(x, y);
+
+        this.state = "patrolling";
+        this.img = img;
+        this.imgIndex = 0;
+        this.direction = "left";
+
+        this.curFrame = frameCount;
+      }
+
+      collisionCheck() {}
+
+      executePatrol() {
+
+          if(this.pos.x == 0) {
+              this.direction = "right";
+          }
+         
+
+          if(this.pos.x == 800) {
+              this.direction = "left"
+          }
+          
+
+          if(!this.collisionCheck()) {
+              if(this.direction == "left") {
+                  this.pos.x--;
+              }
+
+              if(this.direction == "right") {
+                  this.pos.x++;
+              }
+          }
+          else {
+              this.state = "standing";
+              this.imgIndex = 0;
+          }
+
+      }
+
+      executeMove() {
+
+          switch(this.state) {
+  
+            case "standing":
+                this.img = droidStandImage;
+              break;
+  
+            case "patrolling":
+                this.img = droidPatrolImage;
+              break;
+          }
+      }
+
+      display() {
+
+          this.executeMove();
+
+          if(this.imgIndex == this.img.length - 1) {
+              this.imgIndex = 0;
+          }
+          else if(this.curFrame % 60 == 0){
+              this.imgIndex++;
+          }
+
+          pushMatrix();
+              imageMode(CENTER);
+              if(this.direction == "right") {
+                  scale(-1, 1);
+                  image(this.img[this.imgIndex], -this.pos.x, this.pos.y);
+              }
+              else {
+                  image(this.img[this.imgIndex], this.pos.x, this.pos.y);
+              }            
+          popMatrix();
+
+      }
+
+      move(desX, desY) {}
+
+      
+
+      explode() {}
+
+      executeExplode() {}
+
+      reset() {}
+     
+    }
+    
     class playerObj { }
 
     class gameOjb {
