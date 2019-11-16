@@ -39,9 +39,9 @@ One of the main reasons is that the game is written in ES6 and contained exteral
   - The player could go back to the menu screen by pressing **`**
 * ### Score section
   - The top 3 highest score will be displayed. The background  
-    has a big rocket circling from the mid left side to the screen  
+    has a big rocket flying from the mid left side to the screen  
     to the mid top side, then mid right, then repeated.
-  - The player could go back to the menu screen by pressing **`**
+  - The player can go back to the menu screen by pressing **`**
 * ### Achievements section
   - In the main game, there are 3 small challenges. Every time the  
     player completes one of them, they will receive an achivement. All  
@@ -51,4 +51,11 @@ One of the main reasons is that the game is written in ES6 and contained exteral
 
 > ## Play Page
 
-- In progress
+-   The play page will open up to a 50 x 50 character screen with the player on the bottom-right corner. 
+    The goal of the game is to collect all the batteries and kill all the droids.
+    The player animation consists of a space soldier and the droids are essentially one-eyed
+    robots that fly around. The player can kill the robots by pressing the h key to shoot plasma bullets.
+    To collect the batteries, the player must move close to them. 
+    
+    Overall, the tilemap used so far is only a small section of the final tilemap, which is currently still under
+    development. The final tilemap will be 96 x 112 character tilemap.
