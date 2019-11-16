@@ -32,7 +32,7 @@ This game DOES NOT WORK on Khan Acedemy due to extra features that are not provi
      left and replaced by instruction content.
   - **SCORE**: The menu content will slowing shift to the right  
      and replace by the 3 highest scores of the player.
-  - **ACHIVEMENT**: The menu content will slowly shift upward  
+  - **ACHIEVEMENT**: The menu content will slowly shift upward  
      and replaced by the achivement mark that the player's earned.
 
 * ### Instruction section
