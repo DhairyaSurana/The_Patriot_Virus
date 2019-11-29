@@ -63,14 +63,12 @@ This game DOES NOT WORK on Khan Acedemy due to extra features that are not provi
     Overall, the tilemap used so far is only a small section of the final tilemap, which is currently still under
     development. The final tilemap will be 96 x 112 character tilemap.
     
-*/ 
-
-
+*/
 
 var sketchProc = function(processingInstance) {
   with (processingInstance) {
     size(800, 800);
-    frameRate(60);
+    frameRate(30);
     var gameFont = createFont("Bitstream Charter Bold");
     noStroke();
     //######################################################################################################
@@ -88,7 +86,7 @@ var sketchProc = function(processingInstance) {
       one: 0,
       two: 0,
       three: 0
-    }
+    };
 
     remainPoints = 0;
 
@@ -119,8 +117,6 @@ var sketchProc = function(processingInstance) {
 
     //############################################### LOAD IMAGES ######################################
 
-    // When developing locally, set url = "."
-    // otherwise, set url = "https://thepatriotvirus.s3.amazonaws.com"
     url = ".";
     openTitleImage = loadImage(url + "/images/gameTitle.png");
     instrTitleImage = loadImage(url + "/images/instrTitle.png");
@@ -525,7 +521,6 @@ var sketchProc = function(processingInstance) {
         //   this.rocketSix.move(400, 400);
         // }
         changePage("GAME");
-
       }
 
       collisionCheck() {
@@ -906,8 +901,6 @@ var sketchProc = function(processingInstance) {
       }
     }
 
-
-
     //############################################### BULLET OBJECT ##################################
     class bulletObj {
       constructor() {
@@ -992,7 +985,7 @@ var sketchProc = function(processingInstance) {
         }
       }
 
-      removeObj(){
+      removeObj() {
         this.pos.set(-1000, -1000);
       }
 
@@ -1070,7 +1063,7 @@ var sketchProc = function(processingInstance) {
                 break;
               case "c":
                 this.objects.push(
-                  new obj(x * IMAGESIZE, y * IMAGESIZE, "coin")                 
+                  new obj(x * IMAGESIZE, y * IMAGESIZE, "coin")
                 );
                 remainPoints++;
                 break;
@@ -1112,8 +1105,7 @@ var sketchProc = function(processingInstance) {
             ) {
               changePage("SCORE");
             }
-          }
-          else if (this.objects[i].name == "coin"){
+          } else if (this.objects[i].name == "coin") {
             if (
               dist(
                 this.objects[i].pos.x,
@@ -1123,7 +1115,7 @@ var sketchProc = function(processingInstance) {
               ) < 50
             ) {
               //TODO: add score
-              playerScore.one ++;
+              playerScore.one++;
               this.objects[i].removeObj();
               remainPoints--;
             }
@@ -1153,14 +1145,14 @@ var sketchProc = function(processingInstance) {
             ) {
               this.monsters[i].killed();
               remainPoints--;
-              playerScore.one ++;
+              playerScore.one++;
             }
           }
         }
       }
 
       display() {
-        if (remainPoints === 0){
+        if (remainPoints === 0) {
           changePage("ACHIEVEMENT");
         }
         for (var i = 0; i < this.objects.length; i++) {
