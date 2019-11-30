@@ -92,7 +92,7 @@ var tileMap = [
 "w                      b         b                   b         b                                          w",
 "w                      bbbbbbbbbbb                   bbbbbbbbbbb                                          w",
 "w                   r                                                                                     w",
-"w                 r                                                                                       w",
-"w      m                                                                                                  w",
+"w          wwwwwwwwwwwwwwwwwwwwwwwwww       r                                                             w",
+"w s     m        d                          s         m        s                                          w",
 "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww"
 ];

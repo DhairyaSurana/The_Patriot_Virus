@@ -88,18 +88,52 @@ var sketchProc = function(processingInstance) {
     ];
 
     monsterImages = [
-      loadImage(url + "/images/monsterf1.png"),
-      loadImage(url + "/images/monsterf2.png"),
-      loadImage(url + "/images/monsterf3.png"),
-      loadImage(url + "/images/monsterf4.png")
+      loadImage(url + "/testImages/monsterf1.png"),
+      loadImage(url + "/testImages/monsterf2.png"),
+      loadImage(url + "/testImages/monsterf3.png"),
+      loadImage(url + "/testImages/monsterf4.png")
     ];
 
-    trapImages = [
+    lightningTrapImages = [
       loadImage(url + "/images/trapf1.png"),
       loadImage(url + "/images/trapf2.png"),
       loadImage(url + "/images/trapf3.png"),
       loadImage(url + "/images/trapf4.png")
     ];
+
+    directory = "/images/";
+
+    shockTrapImages = {
+      trap_switch: [
+        loadImage(url + directory + "switchf1.png"),
+        loadImage(url + directory + "switchf2.png"),
+        loadImage(url + directory + "switchf3.png"),
+        loadImage(url + directory + "switchf4.png")
+      ],
+
+      shock:  [
+        loadImage(url + directory + "shockf1.png"),
+        loadImage(url + directory + "shockf2.png"),
+        loadImage(url + directory + "shockf3.png"),
+        loadImage(url + directory + "shockf4.png")
+      ]
+    }
+
+    crushTrapImages = [
+      loadImage(url + directory + "springf1.png"),
+      loadImage(url + directory + "springf2.png"),
+      loadImage(url + directory + "springf3.png"),
+      loadImage(url + directory + "springf4.png")
+    ]
+    
+
+    parallaxImages = [
+
+      loadImage(url + directory + "purpleSpaceBackground.png"),
+      loadImage(url + directory + "purpleFarStars.png"),
+      loadImage(url + directory + "spaceStation1.png")
+    ]
+
 
     coinImages = [
       loadImage(url + "/images/coinf1.png"),
@@ -108,11 +142,29 @@ var sketchProc = function(processingInstance) {
       loadImage(url + "/images/coinf4.png")
     ];
 
+   
     flDiskImage = loadImage(url + "/images/floppyDisk.png");
     binaryImage = loadImage(url + "/images/binary.png");
     wireImage = loadImage(url + "/images/wire.png");
     ramImage = loadImage(url + "/images/ram.png");
     mbImage = loadImage(url + "/images/motherboard.png");
+
+    //############################################### LOAD SOUNDS ######################################
+
+    laserSound = new Audio(url + "/sounds/laser.mp3");
+    mainMenuSoundtrack = new Audio(url + "/sounds/mainMenuSoundtrack.mp3");
+    gameSoundtrack = new Audio(url + "/sounds/gameSoundtrack.mp3");
+    gameSoundtrack.volume = 0.2;
+
+    var playSound = function(sound) {
+      sound.play();
+    }
+
+    var stopSound = function(sound) {
+      sound.pause();
+      sound.currentTime = 0;
+    }
+
     //############################################### OBJECT ##################################
 
     class obj {
@@ -151,7 +203,7 @@ var sketchProc = function(processingInstance) {
           image(binaryImage, this.pos.x, this.pos.y, IMAGESIZE, IMAGESIZE);
         } else if (this.name == "trap") {
           image(
-            trapImages[this.frameIndex],
+            lightningTrapImages[this.frameIndex],
             this.pos.x,
             this.pos.y,
             IMAGESIZE,
@@ -207,6 +259,11 @@ var sketchProc = function(processingInstance) {
 
       display() {
         if (this.shooting) {
+
+          if(this.frameIndex == 0) {
+            playSound(laserSound);
+          }
+
           this.changeFrameIndex();
           pushMatrix();
           if (this.direction === "LEFT") {
@@ -247,32 +304,14 @@ var sketchProc = function(processingInstance) {
       new bulletObj(),
       new bulletObj()
     ];
-    //############################################### TILE MAP ##################################
-
-    // var tileMap = [
-    //   "wwwwwwwwwwwwwwwww",
-    //   "                 ",
-    //   " wwww   w www    ",
-    //   "            c    ",
-    //   "    w w  ww      ",
-    //   "           m     ",
-    //   "         wwww    ",
-    //   "              t  ",
-    //   "    www          ",
-    //   "            w    ",
-    //   "       w         ",
-    //   "            ww   ",
-    //   "          w      ",
-    //   " wwww         c  ",
-    //   "             www ",
-    //   "      m w  w  p  ",
-    //   "wwwwwwwwwwwwwwwww"
-    // ];
+    
 
     class gameObj {
       constructor() {
         this.objects = [];
         this.monsters = [];
+        this.shockTraps = [];
+        this.crushTraps = [];
         this.player = new playerObj(0, 0);
         this.gameCenter = new PVector(0, 0);
       }
@@ -311,6 +350,16 @@ var sketchProc = function(processingInstance) {
                 this.monsters.push(
                   new monsterObj(x * IMAGESIZE, y * IMAGESIZE)
                 );
+                break;
+              case "s":
+                this.shockTraps.push(
+                  new shockTrapObj(x * IMAGESIZE, y * IMAGESIZE)
+                )
+                break;
+              case "d":
+                this.crushTraps.push(
+                  new crushTrapObj(x * IMAGESIZE, y * IMAGESIZE)
+                )
                 break;
             }
           }
@@ -384,13 +433,46 @@ var sketchProc = function(processingInstance) {
                 bullets[z].pos.y
               ) < 50
             ) {
-              this.monsters[i].killed();
+              this.monsters[i].deductHp();
             }
           }
+        }
+
+        for (var i = 0; i < this.shockTraps.length; i++) {
+          if (
+            dist(
+              this.player.pos.x,
+              this.player.pos.y,
+              this.shockTraps[i].pos.x,
+              this.shockTraps[i].pos.y
+            ) < 40
+          ) {
+            this.shockTraps[i].activate();
+            this.player.deductHp();
+          }
+
+        }
+
+        for (var i = 0; i < this.crushTraps.length; i++) {
+          if (
+            dist(
+              this.player.pos.x,
+              this.player.pos.y,
+              this.crushTraps[i].pos.x,
+              this.crushTraps[i].pos.y
+            ) < 40
+          ) {
+            this.crushTraps[i].activate();
+            this.player.deductHp();
+          }
+
         }
       }
 
       display() {
+
+        playSound(gameSoundtrack);
+
         for (var i = 0; i < this.objects.length; i++) {
           this.objects[i].display();
         }
@@ -399,7 +481,17 @@ var sketchProc = function(processingInstance) {
         }
         this.player.display();
         this.player.keyPressed();
+
+        for (var i = 0; i < this.shockTraps.length; i++) {
+          this.shockTraps[i].display();
+        }
+
+        for (var i = 0; i < this.crushTraps.length; i++) {
+          this.crushTraps[i].display();
+        }
+
         this.collisionCheck();
+       
       }
     }
 
@@ -415,6 +507,11 @@ var sketchProc = function(processingInstance) {
           LEFT: true,
           RIGHT: false
         };
+
+        this.curHpTime = millis();
+        this.preHpTime = this.curHpTime;
+        this.hp = 50;
+
         this.die = false;
       }
 
@@ -425,6 +522,7 @@ var sketchProc = function(processingInstance) {
 
       display(playerX, playerY) {
         if (!this.die) {
+          this.curHpTime = millis();
           this.changeFrameIndex();
           this.move(playerX, playerY);
           pushMatrix();
@@ -447,6 +545,25 @@ var sketchProc = function(processingInstance) {
             );
           }
           popMatrix();
+
+          this.displayHP();
+        }
+      }
+
+      displayHP() {
+        fill(30,144,255);
+        rectMode(CENTER);
+        rect(this.pos.x, this.pos.y - 40, this.hp, 5);
+      }
+
+      deductHp() {
+        if (this.curHpTime - this.preHpTime > 120 && this.hp > 0) {
+          this.hp-=10;
+          this.preHpTime = this.curHpTime;
+        }
+        if (this.hp === 0){
+          this.killed();
+          //TODO: Die animation
         }
       }
 
@@ -710,6 +827,202 @@ var sketchProc = function(processingInstance) {
       }
     }
 
+    //############################################### SHOCK TRAP OBJECT ##################################
+
+    class shockTrapObj extends obj {
+
+      constructor(x, y) {  
+        
+        super();
+        this.pos = new PVector(x, y);
+        
+        this.switchImages = shockTrapImages["trap_switch"];
+        this.shockImages = shockTrapImages["shock"];
+
+        this.frameIndex = 0;
+        this.size = IMAGESIZE;
+
+        this.curTime = millis();
+        this.preTime = this.curTime;
+
+        this.state = "TRAP SWITCH";
+
+        this.is_activated = false;
+
+
+      }
+
+      changeFrameIndex() {
+        this.curTime = millis();
+        if (this.curTime - this.preTime > 200) {
+          this.frameIndex++;
+          this.preTime = this.curTime;
+        }
+        if (this.frameIndex > 3) {
+          this.frameIndex = 0;
+        }
+      }
+
+      executeSwitchChange() {
+
+          image(this.switchImages[this.frameIndex], this.pos.x, this.pos.y, this.size * 2, this.size);
+          this.changeFrameIndex();
+          if(this.frameIndex == 3) {
+            this.state = "SHOCK";  
+          }
+      }
+      
+      activate() {
+        this.is_activated = true;
+      }
+
+      executeShock() {
+
+          image(this.switchImages[3], this.pos.x, this.pos.y, this.size * 2, this.size);
+          image(this.shockImages[this.frameIndex], this.pos.x, this.pos.y, this.size * 2, this.size);
+            
+          this.changeFrameIndex();
+      }
+    
+      display() {
+        
+        pushMatrix();
+        imageMode(CENTER);
+
+        if(this.is_activated) {
+          switch(this.state) {
+
+            case "TRAP SWITCH":
+                this.executeSwitchChange();
+              break;
+
+            case "SHOCK":
+                this.executeShock();
+              break;
+
+          }
+          this.curFrame = frameCount;
+        }
+        else {
+          image(this.switchImages[0], this.pos.x, this.pos.y, this.size * 2, this.size);
+        }
+
+        popMatrix();
+        
+      }
+    
+    }
+
+    //############################################### CRUSH TRAP OBJECT ##################################
+
+    class crushTrapObj extends obj {
+  
+      constructor(x, y) {  
+
+        super();
+        this.pos = new PVector(x, y);
+
+        this.crushImages = crushTrapImages;
+       
+        this.frameIndex = 0;
+        this.size = IMAGESIZE * 1.5;
+
+        this.curTime = millis();
+        this.preTime = this.curTime;
+
+        this.is_activated = false;
+
+      }
+
+      changeFrameIndex() {
+
+        this.curTime = millis();
+
+        if (this.curTime - this.preTime > 200) {
+          this.frameIndex++;
+          this.preTime = this.curTime;
+        }
+
+        if (this.frameIndex > 3) {
+          this.frameIndex = 0;
+        }
+        
+      }
+
+      activate() {
+        this.is_activated = true;
+      }
+
+      display() {
+
+        pushMatrix();
+        imageMode(CENTER);
+
+        if(this.is_activated) {
+          image(this.crushImages[this.frameIndex], this.pos.x, this.pos.y, this.size, this.size);
+
+          scale(-1, -1);
+          image(this.crushImages[this.frameIndex], -this.pos.x, -this.pos.y, this.size, this.size);
+
+          this.changeFrameIndex();
+          this.curFrame = frameCount;
+        }
+        else {
+          image(this.crushImages[0], this.pos.x, this.pos.y, this.size, this.size);
+        }
+
+        popMatrix();
+        
+      }
+    }
+
+    //############################################### PARALLAX OBJECT ##################################
+
+    class parallaxObj {
+
+      constructor(image, game, x, y, w, h, loop_condition) {
+        this.pos = new PVector(x, y);
+        this.image = image;
+        this.game = game;
+
+        this.loop_condition = loop_condition
+
+        this.w = w;
+        this.h = h;
+      }
+
+      display(rate) {
+
+        if(this.game.player.state["RUN"]) {
+          
+          if(this.game.player.direction["RIGHT"]) {
+            this.pos.x-=rate;
+          }
+          else if(this.game.player.direction["LEFT"]) {
+            this.pos.x+=rate;
+          }
+
+          if(this.loop_condition) {
+            if(this.pos.x < -150) {
+              this.pos.x = 6000;
+              this.pos.y = random(0, 700);
+            }
+
+            if(this.pos.x > 6000) {
+              this.pos.x = -150;
+              this.pos.y = random(0, 700);
+            }
+          }
+        }
+
+        image(this.image, this.pos.x, this.pos.y, this.w, this.h);
+        
+      }
+
+      move(rate) {
+        this.pos.x+=rate;
+      }
+    }
     //############################################### KEYPRESSED ######################################
 
     var keyPressed = function() {
@@ -722,16 +1035,29 @@ var sketchProc = function(processingInstance) {
 
     //############################################### CREATE OBJECT ######################################
 
-    // var player = new playerObj(400, 400);
     var game = new gameObj();
     game.initGame();
+
+    //############################################### CREATE PARALLAX LAYERS ######################################
+
+    var parallaxSpaceLayer = new parallaxObj(parallaxImages[0], game, 0, 200, 2400, 1300, false);
+    var parallaxFarStarsLayer = new parallaxObj(parallaxImages[1], game, 0, 200, 2400, 1300, false);
+    var parallaxStation1Layer = new parallaxObj(parallaxImages[2], game, 600, 200, 300, 300, true);
+
     //############################################### EXECUTION ######################################
     var draw = function() {
-      background(50, 72, 81);
+      
+      parallaxSpaceLayer.display(0.05);
+      parallaxFarStarsLayer.display(0.07);
+      parallaxStation1Layer.display(0.2);
+      
       pushMatrix();
       translate(-game.player.pos.x + 400, -game.player.pos.y + 400);
+    
       game.display();
       popMatrix();
+
+      //text(game.player.pos.x, 300, 300);
     };
 
     //######################################################################################################
