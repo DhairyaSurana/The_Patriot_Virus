@@ -79,7 +79,8 @@ var sketchProc = function(processingInstance) {
       GAME: false,
       INSTRUCTION: false,
       SCORE: false,
-      ACHIEVEMENT: false
+      ACHIEVEMENT: false,
+      GAMEOVER: false
     };
 
     playerScore = {
@@ -91,28 +92,10 @@ var sketchProc = function(processingInstance) {
     remainPoints = 0;
 
     var changePage = function changePage(page) {
-      STATE.OPEN = false;
-      STATE.GAME = false;
-      STATE.INSTRUCTION = false;
-      STATE.SCORE = false;
-      STATE.ACHIEVEMENT = false;
-      switch (page) {
-        case "OPEN":
-          STATE.OPEN = true;
-          break;
-        case "GAME":
-          STATE.GAME = true;
-          break;
-        case "INSTRUCTION":
-          STATE.INSTRUCTION = true;
-          break;
-        case "SCORE":
-          STATE.SCORE = true;
-          break;
-        case "ACHIEVEMENT":
-          STATE.ACHIEVEMENT = true;
-          break;
-      }
+      for (var key in STATE){
+        STATE[key] = false;
+      } 
+      STATE[page] = true;
     };
 
     //############################################### LOAD IMAGES ######################################
@@ -1198,30 +1181,32 @@ var sketchProc = function(processingInstance) {
       }
 
       display() {
-        if (!this.die) {
-          this.changeFrameIndex();
-          this.move();
-          pushMatrix();
-          if (this.direction.RIGHT) {
-            scale(-1, 1);
-            image(
-              monsterImages[this.frameIndex],
-              -this.pos.x,
-              this.pos.y,
-              IMAGESIZE,
-              IMAGESIZE
-            );
-          } else {
-            image(
-              monsterImages[this.frameIndex],
-              this.pos.x,
-              this.pos.y,
-              IMAGESIZE,
-              IMAGESIZE
-            );
-          }
-          popMatrix();
+        if (this.die) {
+          return;
         }
+
+        this.changeFrameIndex();
+        this.move();
+        pushMatrix();
+        if (this.direction.RIGHT) {
+          scale(-1, 1);
+          image(
+            monsterImages[this.frameIndex],
+            -this.pos.x,
+            this.pos.y,
+            IMAGESIZE,
+            IMAGESIZE
+          );
+        } else {
+          image(
+            monsterImages[this.frameIndex],
+            this.pos.x,
+            this.pos.y,
+            IMAGESIZE,
+            IMAGESIZE
+          );
+        }
+        popMatrix();
       }
 
       move() {
@@ -1265,8 +1250,6 @@ var sketchProc = function(processingInstance) {
         this.stop = false;
 
         this.bulletIndex = 0;
-        // this.stopLeft = false;
-        // this.stopRight = false;
         this.state = {
           IDLE: false,
           RUN: true,

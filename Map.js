@@ -1,3 +1,15 @@
+/*
+w = wall
+m = monster
+f = flame thrower gun
+s = stair
+k = key
+e = energy
+n = sniper
+t = string trap
+u = thurnder trap
+*/
+
 var tileMap = [
 "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",
 "w                                                                                                         w",
@@ -33,16 +45,16 @@ var tileMap = [
 "w   w   w     w                              w                                                            w",
 "w   w R w     w                              w                                                            w",
 "w   w E w     w                              w                                                            w",
-"w   w G rrrrrrr                              w                                                            w",
-"w   w I w     w   rrr                        w                                                            w",
+"w   w G sssssss                              w                                                            w",
+"w   w I w     w   sss                        w                                                            w",
 "w   w S w     w                              w                                                            w",
-"w   w T w  rrrr        rrr                   w           ww                                               w",
+"w   w T w  ssss        sss                   w           ww                                               w",
 "w   w E w     w                              w           w w                                              w",
-"w   w R w  r  w            rrr               w           w  w                                             w",
+"w   w s w  s  w            sss               w           w  w                                             w",
 "w   w   w     w                              w           w   w                                            w",
-"w   w   w  r  w                rrr           w           w    w                                           w",
+"w   w   w  s  w                sss           w           w    w                                           w",
 "w   w   w     w                              w           w     w                                          w",
-"w   w   w  r  w                              w           w      w                                         w",
+"w   w   w  s  w                              w           w      w                                         w",
 "w   w   w  p  w                              w           w       w                                        w",
 "w   w   wwwwwww                              w           w        w                                       w",
 "w   w   w     w                              w           w         w                                      w",
@@ -53,9 +65,9 @@ var tileMap = [
 "w   wwwww     wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww           w ALU     w         wwwwwwwwwwwwwwww             w",
 "w                                                        w         w         w              w             w",
 "w                                                        w         w         w              w             w",
-"w                                                        w         w         rrrrrrrrrrrr rrr             w",
+"w                                                        w         w         rrrrrrrrrrrr sss             w",
 "w                                                        w         w         w              w             w",
-"w                                                        w         rrrrrrrrrrrrrr rrrrrr  rrr             w",
+"w                                                        w         rrrrrrrrrrrrrr rrrrrr  sss             w",
 "w                                                        w         w         w              w             w",
 "w                                                        w        w          w              w             w",
 "w                                                        w       w           w              w             w",
@@ -83,16 +95,19 @@ var tileMap = [
 "w                                                                                                         w",
 "w                                                                                                         w",
 "w                      bbbbbbbbbbb                   bbbbbbbbbbb                                          w",
-"w                      b         b                   b         b                                          w",
-"w                      b SIGN    b                   b         b                                          w",
-"w                      b EXTEND  b                   b ALU     b                                          w",
-"w                      b         b                   b CONTROL b                                          w",
-"w                      b         b                   b         b                                          w",
-"w                      b         b                   b         b                                          w",
-"w                      b         b                   b         b                                          w",
+"w                      bbbbbbbbbbb                   b         b                                          w",
+"w                      bbbbbbbbbbb                   b         b                                          w",
+"w                      bbbbbbbbbbb                   b ALU     b                                          w",
+"w                      bbbbbbbbbbb                   b CONTROL b                                          w",
+"w                      bbbbbbbbbbb                   b         b                                          w",
+"w                      bbbbbbbbbbb                   b         b                                          w",
+"w                      bbbbbbbbbbb                   b         b                                          w",
 "w                      bbbbbbbbbbb                   bbbbbbbbbbb                                          w",
-"w                   r                                                                                     w",
-"w                 r                                                                                       w",
+"w                   s                                                                                     w",
+"w                 s                                                                                       w",
 "w      m                                                                                                  w",
+"wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",
+"wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",
+"wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",
 "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww"
 ];

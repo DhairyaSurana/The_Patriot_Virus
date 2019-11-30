@@ -10,37 +10,21 @@ var sketchProc = function(processingInstance) {
     //##############################################START HERE##############################################
     //######################################################################################################
     STATE = {
-      OPEN: true,
-      GAME: false,
+      OPEN: false,
+      GAME: true,
       INSTRUCTION: false,
       SCORE: false,
-      ACHIEVEMENT: false
+      ACHIEVEMENT: false,
+      GAMEOVER: false
+    };
+
+    var changePage = function changePage(page) {
+      for (var key in STATE) {
+        STATE[key] = false;
+      }
+      STATE[page] = true;
     };
     const IMAGESIZE = 50;
-    var changePage = function changePage(page) {
-      STATE.OPEN = false;
-      STATE.GAME = false;
-      STATE.INSTRUCTION = false;
-      STATE.SCORE = false;
-      STATE.ACHIEVEMENT = false;
-      switch (page) {
-        case "OPEN":
-          STATE.OPEN = true;
-          break;
-        case "GAME":
-          STATE.GAME = true;
-          break;
-        case "INSTRUCTION":
-          STATE.INSTRUCTION = true;
-          break;
-        case "SCORE":
-          STATE.SCORE = true;
-          break;
-        case "ACHIEVEMENT":
-          STATE.ACHIEVEMENT = true;
-          break;
-      }
-    };
 
     //############################################### LOAD IMAGES ######################################
 
@@ -61,13 +45,9 @@ var sketchProc = function(processingInstance) {
         loadImage(url + "/images/runf3.png"),
         loadImage(url + "/images/runf4.png")
       ],
-      shoot: [
-        loadImage(url + "/images/shootf1.png"),
-        loadImage(url + "/images/shootf2.png"),
-        loadImage(url + "/images/shootf3.png"),
-        loadImage(url + "/images/shootf4.png")
-      ],
+      recoil: [loadImage(url + "/images/shootf1.png")],
       dying: [
+        loadImage(url + "/images/standf1.png"),
         loadImage(url + "/images/dyingf1.png"),
         loadImage(url + "/images/dyingf2.png"),
         loadImage(url + "/images/dyingf3.png"),
@@ -87,6 +67,13 @@ var sketchProc = function(processingInstance) {
       loadImage(url + "/images/bulletf4.png")
     ];
 
+    flameImages = [
+      loadImage(url + "/images/flamef1.png"),
+      loadImage(url + "/images/flamef2.png"),
+      loadImage(url + "/images/flamef3.png"),
+      loadImage(url + "/images/flamef4.png")
+    ];
+
     monsterImages = [
       loadImage(url + "/images/monsterf1.png"),
       loadImage(url + "/images/monsterf2.png"),
@@ -102,16 +89,20 @@ var sketchProc = function(processingInstance) {
     ];
 
     coinImages = [
-      loadImage(url + "/images/coinf1.png"),
-      loadImage(url + "/images/coinf2.png"),
-      loadImage(url + "/images/coinf3.png"),
-      loadImage(url + "/images/coinf4.png")
+      loadImage(url + "/images/collectiblef1.png"),
+      loadImage(url + "/images/collectiblef2.png"),
+      loadImage(url + "/images/collectiblef3.png"),
+      loadImage(url + "/images/collectiblef4.png")
     ];
+
+    sniperRifle = loadImage(url + "/images/sniper.png");
+    flameThrower = loadImage(url + "/images/flameThrower.png");
+    keyImage = loadImage(url + "/images/key.png");
 
     flDiskImage = loadImage(url + "/images/floppyDisk.png");
     binaryImage = loadImage(url + "/images/binary.png");
     wireImage = loadImage(url + "/images/wire.png");
-    ramImage = loadImage(url + "/images/ram.png");
+    stairImage = loadImage(url + "/images/ram.png");
     mbImage = loadImage(url + "/images/motherboard.png");
     //############################################### OBJECT ##################################
 
@@ -145,8 +136,8 @@ var sketchProc = function(processingInstance) {
         imageMode(CENTER);
         if (this.name === "wall") {
           image(wireImage, this.pos.x, this.pos.y, IMAGESIZE, IMAGESIZE);
-        } else if (this.name === "ram") {
-          image(ramImage, this.pos.x, this.pos.y, IMAGESIZE, IMAGESIZE);
+        } else if (this.name === "stair") {
+          image(stairImage, this.pos.x, this.pos.y, IMAGESIZE, IMAGESIZE);
         } else if (this.name === "binary") {
           image(binaryImage, this.pos.x, this.pos.y, IMAGESIZE, IMAGESIZE);
         } else if (this.name == "trap") {
@@ -181,6 +172,8 @@ var sketchProc = function(processingInstance) {
         this.direction = "NONE";
         this.frameIndex = 0;
         this.shooting = false;
+        this.gunType = "sniper";
+        this.ammoImage = bulletImages;
       }
 
       changeFrameIndex() {
@@ -198,7 +191,15 @@ var sketchProc = function(processingInstance) {
         }
       }
 
-      fire(x, y, direction) {
+      fired(x, y, direction, gunType) {
+        if (gunType === "sniper") {
+          this.ammoImage = bulletImages;
+        }
+
+        if (gunType === "flameThrower") {
+          this.ammoImage = flameImages;
+        }
+        this.gunType = gunType;
         this.pos.set(x, y);
         this.direction = direction;
         this.frameIndex = 0;
@@ -210,10 +211,9 @@ var sketchProc = function(processingInstance) {
           this.changeFrameIndex();
           pushMatrix();
           if (this.direction === "LEFT") {
-            console.log(this.direction.LEFT);
             scale(-1, 1);
             image(
-              bulletImages[this.frameIndex],
+              this.ammoImage[this.frameIndex],
               -this.pos.x,
               this.pos.y,
               IMAGESIZE,
@@ -221,7 +221,7 @@ var sketchProc = function(processingInstance) {
             );
           } else {
             image(
-              bulletImages[this.frameIndex],
+              this.ammoImage[this.frameIndex],
               this.pos.x,
               this.pos.y,
               IMAGESIZE,
@@ -233,10 +233,19 @@ var sketchProc = function(processingInstance) {
       }
 
       updatePos() {
+        var ammoRange = 0;
+        if (this.gunType === "sniper") {
+          ammoRange = 100;
+        }
+
+        if (this.gunType == "flameThrower") {
+          ammoRange = 25;
+        }
+
         if (this.direction === "LEFT") {
-          this.pos.x -= 50;
+          this.pos.x -= ammoRange;
         } else if (this.direction === "RIGHT") {
-          this.pos.x += 50;
+          this.pos.x += ammoRange;
         }
       }
     }
@@ -247,27 +256,7 @@ var sketchProc = function(processingInstance) {
       new bulletObj(),
       new bulletObj()
     ];
-    //############################################### TILE MAP ##################################
-
-    // var tileMap = [
-    //   "wwwwwwwwwwwwwwwww",
-    //   "                 ",
-    //   " wwww   w www    ",
-    //   "            c    ",
-    //   "    w w  ww      ",
-    //   "           m     ",
-    //   "         wwww    ",
-    //   "              t  ",
-    //   "    www          ",
-    //   "            w    ",
-    //   "       w         ",
-    //   "            ww   ",
-    //   "          w      ",
-    //   " wwww         c  ",
-    //   "             www ",
-    //   "      m w  w  p  ",
-    //   "wwwwwwwwwwwwwwwww"
-    // ];
+    //############################################### GAME OBJECT ##################################
 
     class gameObj {
       constructor() {
@@ -286,8 +275,10 @@ var sketchProc = function(processingInstance) {
                   new obj(x * IMAGESIZE, y * IMAGESIZE, "wall")
                 );
                 break;
-              case "r":
-                this.objects.push(new obj(x * IMAGESIZE, y * IMAGESIZE, "ram"));
+              case "s":
+                this.objects.push(
+                  new obj(x * IMAGESIZE, y * IMAGESIZE, "stair")
+                );
                 break;
               case "b":
                 this.objects.push(
@@ -322,7 +313,7 @@ var sketchProc = function(processingInstance) {
         for (var i = 0; i < this.objects.length; i++) {
           if (
             this.objects[i].name === "wall" ||
-            this.objects[i].name === "ram" ||
+            this.objects[i].name === "stair" ||
             this.objects[i].name === "binary"
           ) {
             if (
@@ -345,7 +336,7 @@ var sketchProc = function(processingInstance) {
                 this.player.pos.y
               ) < 50
             ) {
-              changePage("SCORE");
+              // changePage("SCORE");
             }
           } else if (this.objects[i].name == "coin") {
             if (
@@ -359,10 +350,22 @@ var sketchProc = function(processingInstance) {
               //TODO: add score
               this.objects[i].removeObj();
             }
+          } else if (this.objects[i].name == "energy") {
+            if (
+              dist(
+                this.objects[i].pos.x,
+                this.objects[i].pos.y,
+                this.player.pos.x,
+                this.player.pos.y
+              ) < 50
+            ) {
+              this.player.recoverHP();
+              this.objects[i].removeObj();
+            }
           }
         }
 
-        for (var i = 0; i < this.monsters.length; i++) {
+        for (i = 0; i < this.monsters.length; i++) {
           if (
             dist(
               this.player.pos.x,
@@ -372,7 +375,7 @@ var sketchProc = function(processingInstance) {
             ) < 50
           ) {
             this.player.deductHp();
-            changePage("SCORE");
+            // changePage("SCORE");
           }
 
           for (var z = 0; z < bullets.length; z++) {
@@ -391,10 +394,11 @@ var sketchProc = function(processingInstance) {
       }
 
       display() {
+        background(255, 255, 255);
         for (var i = 0; i < this.objects.length; i++) {
           this.objects[i].display();
         }
-        for (var i = 0; i < this.monsters.length; i++) {
+        for (i = 0; i < this.monsters.length; i++) {
           this.monsters[i].display(this.player.pos.x, this.player.pos.y);
         }
         this.player.display();
@@ -408,8 +412,6 @@ var sketchProc = function(processingInstance) {
       constructor(x, y) {
         super();
         this.pos = new PVector(x, y);
-        this.curTime = millis();
-        this.preTime = this.curTime;
         this.frameIndex = 0;
         this.direction = {
           LEFT: true,
@@ -424,30 +426,33 @@ var sketchProc = function(processingInstance) {
       }
 
       display(playerX, playerY) {
-        if (!this.die) {
-          this.changeFrameIndex();
-          this.move(playerX, playerY);
-          pushMatrix();
-          if (this.direction.RIGHT) {
-            scale(-1, 1);
-            image(
-              monsterImages[this.frameIndex],
-              -this.pos.x,
-              this.pos.y,
-              IMAGESIZE,
-              IMAGESIZE
-            );
-          } else {
-            image(
-              monsterImages[this.frameIndex],
-              this.pos.x,
-              this.pos.y,
-              IMAGESIZE,
-              IMAGESIZE
-            );
-          }
-          popMatrix();
+        if (this.die) {
+          return;
         }
+
+        this.changeFrameIndex();
+        this.move(playerX, playerY);
+
+        pushMatrix();
+        if (this.direction.RIGHT) {
+          scale(-1, 1);
+          image(
+            monsterImages[this.frameIndex],
+            -this.pos.x,
+            this.pos.y,
+            IMAGESIZE,
+            IMAGESIZE
+          );
+        } else {
+          image(
+            monsterImages[this.frameIndex],
+            this.pos.x,
+            this.pos.y,
+            IMAGESIZE,
+            IMAGESIZE
+          );
+        }
+        popMatrix();
       }
 
       move(playerX, playerY) {
@@ -484,20 +489,14 @@ var sketchProc = function(processingInstance) {
     //############################################### PLAYER OBJECT ##################################
     var keyArray = [];
     var GRAVITY = new PVector(0, 0.15);
-    var LEFTFORCE = new PVector(-0.01, 0);
-    var RIGHTFORCE = new PVector(0.01, 0);
     var JUMPFORCE = new PVector(0, -7);
 
     class playerObj extends obj {
       constructor(x, y) {
         super();
-        this.pos = new PVector(x, y);
         this.velocity = new PVector(0, 0);
         this.acceleration = new PVector(0, 0);
         this.force = new PVector(0, 0);
-
-        this.curTime = millis();
-        this.preTime = this.curTime;
 
         this.curBulletTime = millis();
         this.preBulletTime = this.curBulletTime;
@@ -506,16 +505,17 @@ var sketchProc = function(processingInstance) {
         this.preHpTime = this.curHpTime;
         this.hp = 50;
 
-        this.frameIndex = 0;
         this.groundLv = y;
 
+        this.gunType = "sniper";
         this.bulletIndex = 0;
+        this.reloadDelay = 1000;
+
         this.state = {
           IDLE: false,
           RUN: true,
           JUMP: false,
-          SHOOT: false,
-          DIE: false
+          SHOOT: false
         };
 
         this.direction = {
@@ -607,22 +607,108 @@ var sketchProc = function(processingInstance) {
       }
 
       displayHP() {
-        fill(89, 216, 163);
+        if (this.hp > 20) {
+          fill(89, 216, 163);
+        } else {
+          fill(202, 0, 42);
+        }
         rectMode(CENTER);
         rect(this.pos.x, this.pos.y - 40, this.hp, 5);
       }
 
       deductHp() {
         if (this.curHpTime - this.preHpTime > 120 && this.hp > 0) {
-          this.hp--;
+          this.hp -= 2;
           this.preHpTime = this.curHpTime;
         }
-        if (this.hp === 0){
-          //TODO: Die animation
+        if (this.hp === 0) {
+          changePage("GAMEOVER");
+        }
+      }
+
+      recoverHP() {
+        this.hp += 10;
+        if (this.hp > 50) {
+          this.hp = 50;
+        }
+      }
+
+      changeGun(gunType) {
+        this.gunType = gunType;
+        if (gunType === "sniper") {
+          this.reloadDelay = 1000;
+        }
+        if (guntype === "flameThrower") {
+          this.reloadDelay = 200;
+        }
+      }
+
+      idle(x) {
+        if (this.state.IDLE && !this.state.JUMP) {
+          image(
+            playerImages.idle[this.frameIndex],
+            x,
+            this.pos.y,
+            IMAGESIZE,
+            IMAGESIZE
+          );
+        }
+      }
+
+      run(x) {
+        if (this.state.RUN && !this.state.JUMP) {
+          image(
+            playerImages.run[this.frameIndex],
+            x,
+            this.pos.y,
+            IMAGESIZE,
+            IMAGESIZE
+          );
+        }
+      }
+
+      shoot() {
+        if (this.curBulletTime - this.preBulletTime > this.reloadDelay) {
+          if (this.direction.RIGHT) {
+            bullets[this.bulletIndex].fired(
+              this.pos.x,
+              this.pos.y - 5,
+              "RIGHT",
+              this.gunType
+            );
+          } else {
+            bullets[this.bulletIndex].fired(
+              this.pos.x - 20,
+              this.pos.y,
+              "LEFT",
+              this.gunType
+            );
+          }
+          this.preBulletTime = this.curBulletTime;
+          this.bulletIndex++;
+        }
+
+        if (this.bulletIndex > 3) {
+          this.bulletIndex = 0;
+        }
+      }
+
+      jump(x) {
+        if (this.state.JUMP) {
+          image(
+            playerImages.jump[this.frameIndex],
+            x,
+            this.pos.y,
+            IMAGESIZE,
+            IMAGESIZE
+          );
         }
       }
 
       keyPressed() {
+        if (this.state.DIE) {
+          return;
+        }
         var pressed = false;
         if (keyArray[65] === 1) {
           if (!this.stop) {
@@ -656,57 +742,53 @@ var sketchProc = function(processingInstance) {
           this.changeState("IDLE");
         }
       }
+    }
 
-      idle(x) {
-        if (this.state.IDLE && !this.state.JUMP) {
-          image(
-            playerImages.idle[this.frameIndex],
-            x,
-            this.pos.y,
-            IMAGESIZE,
-            IMAGESIZE
-          );
+    //############################################### GAME OVER SCREEN ######################################
+    class gameOverObj extends obj {
+      constructor(x, y) {
+        super();
+        this.pos = new PVector(x, y);
+        this.rgb = 0;
+      }
+
+      changeFrameIndex() {
+        this.curTime = millis();
+        if (this.curTime - this.preTime > 600) {
+          this.frameIndex++;
+          this.preTime = this.curTime;
+        }
+        if (this.frameIndex > 4) {
+          this.frameIndex = 4;
         }
       }
 
-      run(x) {
-        if (this.state.RUN && !this.state.JUMP) {
-          image(
-            playerImages.run[this.frameIndex],
-            x,
-            this.pos.y,
-            IMAGESIZE,
-            IMAGESIZE
-          );
-        }
+      changeColor() {
+        this.rgb += 1;
       }
 
-      shoot() {
-        if (this.curBulletTime - this.preBulletTime > 200) {
-          if (this.direction.RIGHT) {
-            bullets[this.bulletIndex].fire(this.pos.x, this.pos.y - 5, "RIGHT");
-          } else {
-            bullets[this.bulletIndex].fire(this.pos.x - 20, this.pos.y, "LEFT");
-          }
-          this.preBulletTime = this.curBulletTime;
-          this.bulletIndex++;
-        }
+      display() {
+        this.changeColor();
 
-        if (this.bulletIndex > 3) {
-          this.bulletIndex = 0;
-        }
-      }
+        this.changeFrameIndex();
+        background(this.rgb, this.rgb, this.rgb);
 
-      jump(x) {
-        if (this.state.JUMP) {
-          image(
-            playerImages.jump[this.frameIndex],
-            x,
-            this.pos.y,
-            IMAGESIZE,
-            IMAGESIZE
-          );
-        }
+        fill(255 - this.rgb, 255 - this.rgb, 255 - this.rgb);
+        textFont(gameFont, 100);
+        rectMode(CENTER);
+        textAlign(CENTER, CENTER);
+        text("GAME OVER", 400, 260);
+
+        pushMatrix();
+        imageMode(CENTER);
+        image(
+          playerImages.dying[this.frameIndex],
+          this.pos.x,
+          this.pos.y,
+          IMAGESIZE * 3,
+          IMAGESIZE * 3
+        );
+        popMatrix();
       }
     }
 
@@ -724,14 +806,38 @@ var sketchProc = function(processingInstance) {
 
     // var player = new playerObj(400, 400);
     var game = new gameObj();
+    var gameOver = new gameOverObj(400, 500);
     game.initGame();
     //############################################### EXECUTION ######################################
     var draw = function() {
-      background(50, 72, 81);
-      pushMatrix();
-      translate(-game.player.pos.x + 400, -game.player.pos.y + 400);
-      game.display();
-      popMatrix();
+      // background(50, 72, 81);
+      if (STATE.GAME) {
+        rectMode(CENTER);
+        pushMatrix();
+        translate(-game.player.pos.x + 400, -game.player.pos.y + 400);
+        game.display();
+        popMatrix();
+
+        rectMode(LEFT);
+        rect(0, 0, game.player.hp * 16, 50);
+
+        if (game.player.gunType === "sniper") {
+          image(sniperRifle, 133, 25, 40, 40);
+        } else if (game.player.gunType === "flameThrower") {
+          image(flameThrower, 133, 25, 40, 40);
+        }
+
+        image(coinImages[0], 400, 25, 30, 30);
+        image(keyImage, 667, 25, 30, 30);
+        image(keyImage, 697, 25, 30, 30);
+        image(keyImage, 727, 25, 30, 30);
+
+        fill(0, 0, 0, 100);
+        textFont(gameFont, 15);
+        text(20, 420, 30);
+      } else if (STATE.GAMEOVER) {
+        gameOver.display();
+      }
     };
 
     //######################################################################################################
