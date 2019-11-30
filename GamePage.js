@@ -10,37 +10,21 @@ var sketchProc = function(processingInstance) {
     //##############################################START HERE##############################################
     //######################################################################################################
     STATE = {
-      OPEN: true,
-      GAME: false,
+      OPEN: false,
+      GAME: true,
       INSTRUCTION: false,
       SCORE: false,
-      ACHIEVEMENT: false
+      ACHIEVEMENT: false,
+      GAMEOVER: false
+    };
+
+    var changePage = function changePage(page) {
+      for (var key in STATE) {
+        STATE[key] = false;
+      }
+      STATE[page] = true;
     };
     const IMAGESIZE = 50;
-    var changePage = function changePage(page) {
-      STATE.OPEN = false;
-      STATE.GAME = false;
-      STATE.INSTRUCTION = false;
-      STATE.SCORE = false;
-      STATE.ACHIEVEMENT = false;
-      switch (page) {
-        case "OPEN":
-          STATE.OPEN = true;
-          break;
-        case "GAME":
-          STATE.GAME = true;
-          break;
-        case "INSTRUCTION":
-          STATE.INSTRUCTION = true;
-          break;
-        case "SCORE":
-          STATE.SCORE = true;
-          break;
-        case "ACHIEVEMENT":
-          STATE.ACHIEVEMENT = true;
-          break;
-      }
-    };
 
     //############################################### LOAD IMAGES ######################################
 
@@ -61,13 +45,9 @@ var sketchProc = function(processingInstance) {
         loadImage(url + "/images/runf3.png"),
         loadImage(url + "/images/runf4.png")
       ],
-      shoot: [
-        loadImage(url + "/images/shootf1.png"),
-        loadImage(url + "/images/shootf2.png"),
-        loadImage(url + "/images/shootf3.png"),
-        loadImage(url + "/images/shootf4.png")
-      ],
+      recoil: [loadImage(url + "/images/shootf1.png")],
       dying: [
+        loadImage(url + "/images/standf1.png"),
         loadImage(url + "/images/dyingf1.png"),
         loadImage(url + "/images/dyingf2.png"),
         loadImage(url + "/images/dyingf3.png"),
@@ -87,66 +67,74 @@ var sketchProc = function(processingInstance) {
       loadImage(url + "/images/bulletf4.png")
     ];
 
-    monsterImages = [
-      loadImage(url + "/testImages/monsterf1.png"),
-      loadImage(url + "/testImages/monsterf2.png"),
-      loadImage(url + "/testImages/monsterf3.png"),
-      loadImage(url + "/testImages/monsterf4.png")
+    flameImages = [
+      loadImage(url + "/images/flamef1.png"),
+      loadImage(url + "/images/flamef2.png"),
+      loadImage(url + "/images/flamef3.png"),
+      loadImage(url + "/images/flamef4.png")
     ];
 
-    lightningTrapImages = [
+    monsterImages = [
+      loadImage(url + "/images/monsterf1.png"),
+      loadImage(url + "/images/monsterf2.png"),
+      loadImage(url + "/images/monsterf3.png"),
+      loadImage(url + "/images/monsterf4.png")
+    ];
+
+    trapImages = [
       loadImage(url + "/images/trapf1.png"),
       loadImage(url + "/images/trapf2.png"),
       loadImage(url + "/images/trapf3.png"),
       loadImage(url + "/images/trapf4.png")
     ];
 
-    directory = "/images/";
-
     shockTrapImages = {
       trap_switch: [
-        loadImage(url + directory + "switchf1.png"),
-        loadImage(url + directory + "switchf2.png"),
-        loadImage(url + directory + "switchf3.png"),
-        loadImage(url + directory + "switchf4.png")
+        loadImage(url + "/images/switchf1.png"),
+        loadImage(url + "/images/switchf2.png"),
+        loadImage(url + "/images/switchf3.png"),
+        loadImage(url + "/images/switchf4.png")
       ],
 
       shock:  [
-        loadImage(url + directory + "shockf1.png"),
-        loadImage(url + directory + "shockf2.png"),
-        loadImage(url + directory + "shockf3.png"),
-        loadImage(url + directory + "shockf4.png")
+        loadImage(url + "/images/shockf1.png"),
+        loadImage(url + "/images/shockf2.png"),
+        loadImage(url + "/images/shockf3.png"),
+        loadImage(url + "/images/shockf4.png")
       ]
     }
 
     crushTrapImages = [
-      loadImage(url + directory + "springf1.png"),
-      loadImage(url + directory + "springf2.png"),
-      loadImage(url + directory + "springf3.png"),
-      loadImage(url + directory + "springf4.png")
-    ]
+      loadImage(url + "/images/springf1.png"),
+      loadImage(url + "/images/springf2.png"),
+      loadImage(url + "/images/springf3.png"),
+      loadImage(url + "/images/springf4.png")
+    ];
     
 
     parallaxImages = [
 
-      loadImage(url + directory + "purpleSpaceBackground.png"),
-      loadImage(url + directory + "purpleFarStars.png"),
-      loadImage(url + directory + "spaceStation1.png")
-    ]
+      loadImage(url + "/images/purpleSpaceBackground.png"),
+      loadImage(url + "/images/purpleFarStars.png"),
+      loadImage(url + "/images/spaceStation1.png")
+    ];
 
 
     coinImages = [
-      loadImage(url + "/images/coinf1.png"),
-      loadImage(url + "/images/coinf2.png"),
-      loadImage(url + "/images/coinf3.png"),
-      loadImage(url + "/images/coinf4.png")
+      loadImage(url + "/images/collectiblef1.png"),
+      loadImage(url + "/images/collectiblef2.png"),
+      loadImage(url + "/images/collectiblef3.png"),
+      loadImage(url + "/images/collectiblef4.png")
     ];
 
-   
+    sniperRifle = loadImage(url + "/images/sniper.png");
+    flameThrower = loadImage(url + "/images/flameThrower.png");
+    keyImage = loadImage(url + "/images/key.png");
+
     flDiskImage = loadImage(url + "/images/floppyDisk.png");
     binaryImage = loadImage(url + "/images/binary.png");
     wireImage = loadImage(url + "/images/wire.png");
-    ramImage = loadImage(url + "/images/ram.png");
+    stairImage = loadImage(url + "/images/ram.png");
     mbImage = loadImage(url + "/images/motherboard.png");
 
     //############################################### LOAD SOUNDS ######################################
@@ -155,16 +143,16 @@ var sketchProc = function(processingInstance) {
     mainMenuSoundtrack = new Audio(url + "/sounds/mainMenuSoundtrack.mp3");
     gameSoundtrack = new Audio(url + "/sounds/gameSoundtrack.mp3");
     gameSoundtrack.volume = 0.2;
-
+  
     var playSound = function(sound) {
       sound.play();
     }
-
+  
     var stopSound = function(sound) {
       sound.pause();
       sound.currentTime = 0;
     }
-
+  
     //############################################### OBJECT ##################################
 
     class obj {
@@ -197,13 +185,13 @@ var sketchProc = function(processingInstance) {
         imageMode(CENTER);
         if (this.name === "wall") {
           image(wireImage, this.pos.x, this.pos.y, IMAGESIZE, IMAGESIZE);
-        } else if (this.name === "ram") {
-          image(ramImage, this.pos.x, this.pos.y, IMAGESIZE, IMAGESIZE);
+        } else if (this.name === "stair") {
+          image(stairImage, this.pos.x, this.pos.y, IMAGESIZE, IMAGESIZE);
         } else if (this.name === "binary") {
           image(binaryImage, this.pos.x, this.pos.y, IMAGESIZE, IMAGESIZE);
         } else if (this.name == "trap") {
           image(
-            lightningTrapImages[this.frameIndex],
+            trapImages[this.frameIndex],
             this.pos.x,
             this.pos.y,
             IMAGESIZE,
@@ -233,6 +221,8 @@ var sketchProc = function(processingInstance) {
         this.direction = "NONE";
         this.frameIndex = 0;
         this.shooting = false;
+        this.gunType = "sniper";
+        this.ammoImage = bulletImages;
       }
 
       changeFrameIndex() {
@@ -250,7 +240,15 @@ var sketchProc = function(processingInstance) {
         }
       }
 
-      fire(x, y, direction) {
+      fired(x, y, direction, gunType) {
+        if (gunType === "sniper") {
+          this.ammoImage = bulletImages;
+        }
+
+        if (gunType === "flameThrower") {
+          this.ammoImage = flameImages;
+        }
+        this.gunType = gunType;
         this.pos.set(x, y);
         this.direction = direction;
         this.frameIndex = 0;
@@ -267,10 +265,9 @@ var sketchProc = function(processingInstance) {
           this.changeFrameIndex();
           pushMatrix();
           if (this.direction === "LEFT") {
-            console.log(this.direction.LEFT);
             scale(-1, 1);
             image(
-              bulletImages[this.frameIndex],
+              this.ammoImage[this.frameIndex],
               -this.pos.x,
               this.pos.y,
               IMAGESIZE,
@@ -278,7 +275,7 @@ var sketchProc = function(processingInstance) {
             );
           } else {
             image(
-              bulletImages[this.frameIndex],
+              this.ammoImage[this.frameIndex],
               this.pos.x,
               this.pos.y,
               IMAGESIZE,
@@ -290,10 +287,19 @@ var sketchProc = function(processingInstance) {
       }
 
       updatePos() {
+        var ammoRange = 0;
+        if (this.gunType === "sniper") {
+          ammoRange = 100;
+        }
+
+        if (this.gunType == "flameThrower") {
+          ammoRange = 25;
+        }
+
         if (this.direction === "LEFT") {
-          this.pos.x -= 50;
+          this.pos.x -= ammoRange;
         } else if (this.direction === "RIGHT") {
-          this.pos.x += 50;
+          this.pos.x += ammoRange;
         }
       }
     }
@@ -304,7 +310,7 @@ var sketchProc = function(processingInstance) {
       new bulletObj(),
       new bulletObj()
     ];
-    
+    //############################################### GAME OBJECT ##################################
 
     class gameObj {
       constructor() {
@@ -325,8 +331,10 @@ var sketchProc = function(processingInstance) {
                   new obj(x * IMAGESIZE, y * IMAGESIZE, "wall")
                 );
                 break;
-              case "r":
-                this.objects.push(new obj(x * IMAGESIZE, y * IMAGESIZE, "ram"));
+              case "s":
+                this.objects.push(
+                  new obj(x * IMAGESIZE, y * IMAGESIZE, "stair")
+                );
                 break;
               case "b":
                 this.objects.push(
@@ -351,15 +359,15 @@ var sketchProc = function(processingInstance) {
                   new monsterObj(x * IMAGESIZE, y * IMAGESIZE)
                 );
                 break;
-              case "s":
+              case "a":
                 this.shockTraps.push(
                   new shockTrapObj(x * IMAGESIZE, y * IMAGESIZE)
-                )
+                );
                 break;
               case "d":
                 this.crushTraps.push(
                   new crushTrapObj(x * IMAGESIZE, y * IMAGESIZE)
-                )
+                );
                 break;
             }
           }
@@ -371,7 +379,7 @@ var sketchProc = function(processingInstance) {
         for (var i = 0; i < this.objects.length; i++) {
           if (
             this.objects[i].name === "wall" ||
-            this.objects[i].name === "ram" ||
+            this.objects[i].name === "stair" ||
             this.objects[i].name === "binary"
           ) {
             if (
@@ -394,7 +402,7 @@ var sketchProc = function(processingInstance) {
                 this.player.pos.y
               ) < 50
             ) {
-              changePage("SCORE");
+              // changePage("SCORE");
             }
           } else if (this.objects[i].name == "coin") {
             if (
@@ -408,10 +416,22 @@ var sketchProc = function(processingInstance) {
               //TODO: add score
               this.objects[i].removeObj();
             }
+          } else if (this.objects[i].name == "energy") {
+            if (
+              dist(
+                this.objects[i].pos.x,
+                this.objects[i].pos.y,
+                this.player.pos.x,
+                this.player.pos.y
+              ) < 50
+            ) {
+              this.player.recoverHP();
+              this.objects[i].removeObj();
+            }
           }
         }
 
-        for (var i = 0; i < this.monsters.length; i++) {
+        for (i = 0; i < this.monsters.length; i++) {
           if (
             dist(
               this.player.pos.x,
@@ -421,7 +441,7 @@ var sketchProc = function(processingInstance) {
             ) < 50
           ) {
             this.player.deductHp();
-            changePage("SCORE");
+            // changePage("SCORE");
           }
 
           for (var z = 0; z < bullets.length; z++) {
@@ -476,12 +496,13 @@ var sketchProc = function(processingInstance) {
         for (var i = 0; i < this.objects.length; i++) {
           this.objects[i].display();
         }
-        for (var i = 0; i < this.monsters.length; i++) {
+        for (i = 0; i < this.monsters.length; i++) {
           this.monsters[i].display(this.player.pos.x, this.player.pos.y);
         }
         this.player.display();
         this.player.keyPressed();
 
+        
         for (var i = 0; i < this.shockTraps.length; i++) {
           this.shockTraps[i].display();
         }
@@ -491,7 +512,6 @@ var sketchProc = function(processingInstance) {
         }
 
         this.collisionCheck();
-       
       }
     }
 
@@ -500,8 +520,6 @@ var sketchProc = function(processingInstance) {
       constructor(x, y) {
         super();
         this.pos = new PVector(x, y);
-        this.curTime = millis();
-        this.preTime = this.curTime;
         this.frameIndex = 0;
         this.direction = {
           LEFT: true,
@@ -521,33 +539,35 @@ var sketchProc = function(processingInstance) {
       }
 
       display(playerX, playerY) {
-        if (!this.die) {
-          this.curHpTime = millis();
-          this.changeFrameIndex();
-          this.move(playerX, playerY);
-          pushMatrix();
-          if (this.direction.RIGHT) {
-            scale(-1, 1);
-            image(
-              monsterImages[this.frameIndex],
-              -this.pos.x,
-              this.pos.y,
-              IMAGESIZE,
-              IMAGESIZE
-            );
-          } else {
-            image(
-              monsterImages[this.frameIndex],
-              this.pos.x,
-              this.pos.y,
-              IMAGESIZE,
-              IMAGESIZE
-            );
-          }
-          popMatrix();
-
-          this.displayHP();
+        if (this.die) {
+          return;
         }
+        this.curHpTime = millis();
+        this.changeFrameIndex();
+        this.move(playerX, playerY);
+
+        pushMatrix();
+        if (this.direction.RIGHT) {
+          scale(-1, 1);
+          image(
+            monsterImages[this.frameIndex],
+            -this.pos.x,
+            this.pos.y,
+            IMAGESIZE,
+            IMAGESIZE
+          );
+        } else {
+          image(
+            monsterImages[this.frameIndex],
+            this.pos.x,
+            this.pos.y,
+            IMAGESIZE,
+            IMAGESIZE
+          );
+        }
+        popMatrix();
+
+        this.displayHP();
       }
 
       displayHP() {
@@ -601,20 +621,14 @@ var sketchProc = function(processingInstance) {
     //############################################### PLAYER OBJECT ##################################
     var keyArray = [];
     var GRAVITY = new PVector(0, 0.15);
-    var LEFTFORCE = new PVector(-0.01, 0);
-    var RIGHTFORCE = new PVector(0.01, 0);
     var JUMPFORCE = new PVector(0, -7);
 
     class playerObj extends obj {
       constructor(x, y) {
         super();
-        this.pos = new PVector(x, y);
         this.velocity = new PVector(0, 0);
         this.acceleration = new PVector(0, 0);
         this.force = new PVector(0, 0);
-
-        this.curTime = millis();
-        this.preTime = this.curTime;
 
         this.curBulletTime = millis();
         this.preBulletTime = this.curBulletTime;
@@ -623,16 +637,17 @@ var sketchProc = function(processingInstance) {
         this.preHpTime = this.curHpTime;
         this.hp = 50;
 
-        this.frameIndex = 0;
         this.groundLv = y;
 
+        this.gunType = "sniper";
         this.bulletIndex = 0;
+        this.reloadDelay = 1000;
+
         this.state = {
           IDLE: false,
           RUN: true,
           JUMP: false,
-          SHOOT: false,
-          DIE: false
+          SHOOT: false
         };
 
         this.direction = {
@@ -724,22 +739,108 @@ var sketchProc = function(processingInstance) {
       }
 
       displayHP() {
-        fill(89, 216, 163);
-        rectMode(CENTER);
-        rect(this.pos.x, this.pos.y - 40, this.hp, 5);
+        if (this.hp > 20) {
+          fill(89, 216, 163);
+        } else {
+          fill(202, 0, 42);
+        }
+        // rectMode(CENTER);
+        // rect(this.pos.x, this.pos.y - 40, this.hp, 5);
       }
 
       deductHp() {
         if (this.curHpTime - this.preHpTime > 120 && this.hp > 0) {
-          this.hp--;
+          this.hp -= 2;
           this.preHpTime = this.curHpTime;
         }
-        if (this.hp === 0){
-          //TODO: Die animation
+        if (this.hp === 0) {
+          changePage("GAMEOVER");
+        }
+      }
+
+      recoverHP() {
+        this.hp += 10;
+        if (this.hp > 50) {
+          this.hp = 50;
+        }
+      }
+
+      changeGun(gunType) {
+        this.gunType = gunType;
+        if (gunType === "sniper") {
+          this.reloadDelay = 1000;
+        }
+        if (guntype === "flameThrower") {
+          this.reloadDelay = 200;
+        }
+      }
+
+      idle(x) {
+        if (this.state.IDLE && !this.state.JUMP) {
+          image(
+            playerImages.idle[this.frameIndex],
+            x,
+            this.pos.y,
+            IMAGESIZE,
+            IMAGESIZE
+          );
+        }
+      }
+
+      run(x) {
+        if (this.state.RUN && !this.state.JUMP) {
+          image(
+            playerImages.run[this.frameIndex],
+            x,
+            this.pos.y,
+            IMAGESIZE,
+            IMAGESIZE
+          );
+        }
+      }
+
+      shoot() {
+        if (this.curBulletTime - this.preBulletTime > this.reloadDelay) {
+          if (this.direction.RIGHT) {
+            bullets[this.bulletIndex].fired(
+              this.pos.x,
+              this.pos.y - 5,
+              "RIGHT",
+              this.gunType
+            );
+          } else {
+            bullets[this.bulletIndex].fired(
+              this.pos.x - 20,
+              this.pos.y,
+              "LEFT",
+              this.gunType
+            );
+          }
+          this.preBulletTime = this.curBulletTime;
+          this.bulletIndex++;
+        }
+
+        if (this.bulletIndex > 3) {
+          this.bulletIndex = 0;
+        }
+      }
+
+      jump(x) {
+        if (this.state.JUMP) {
+          image(
+            playerImages.jump[this.frameIndex],
+            x,
+            this.pos.y,
+            IMAGESIZE,
+            IMAGESIZE
+          );
         }
       }
 
       keyPressed() {
+        if (this.state.DIE) {
+          return;
+        }
         var pressed = false;
         if (keyArray[65] === 1) {
           if (!this.stop) {
@@ -773,257 +874,254 @@ var sketchProc = function(processingInstance) {
           this.changeState("IDLE");
         }
       }
+    }
 
-      idle(x) {
-        if (this.state.IDLE && !this.state.JUMP) {
-          image(
-            playerImages.idle[this.frameIndex],
-            x,
-            this.pos.y,
-            IMAGESIZE,
-            IMAGESIZE
-          );
+  //############################################### GAME OVER SCREEN ######################################
+    class gameOverObj extends obj {
+      constructor(x, y) {
+        super();
+        this.pos = new PVector(x, y);
+        this.rgb = 0;
+      }
+
+      changeFrameIndex() {
+        this.curTime = millis();
+        if (this.curTime - this.preTime > 600) {
+          this.frameIndex++;
+          this.preTime = this.curTime;
+        }
+        if (this.frameIndex > 4) {
+          this.frameIndex = 4;
         }
       }
 
-      run(x) {
-        if (this.state.RUN && !this.state.JUMP) {
-          image(
-            playerImages.run[this.frameIndex],
-            x,
-            this.pos.y,
-            IMAGESIZE,
-            IMAGESIZE
-          );
-        }
+      changeColor() {
+        this.rgb += 1;
       }
 
-      shoot() {
-        if (this.curBulletTime - this.preBulletTime > 200) {
-          if (this.direction.RIGHT) {
-            bullets[this.bulletIndex].fire(this.pos.x, this.pos.y - 5, "RIGHT");
-          } else {
-            bullets[this.bulletIndex].fire(this.pos.x - 20, this.pos.y, "LEFT");
-          }
-          this.preBulletTime = this.curBulletTime;
-          this.bulletIndex++;
-        }
+      display() {
+        this.changeColor();
 
-        if (this.bulletIndex > 3) {
-          this.bulletIndex = 0;
-        }
-      }
+        this.changeFrameIndex();
+        background(this.rgb, this.rgb, this.rgb);
 
-      jump(x) {
-        if (this.state.JUMP) {
-          image(
-            playerImages.jump[this.frameIndex],
-            x,
-            this.pos.y,
-            IMAGESIZE,
-            IMAGESIZE
-          );
-        }
+        fill(255 - this.rgb, 255 - this.rgb, 255 - this.rgb);
+        textFont(gameFont, 100);
+        rectMode(CENTER);
+        textAlign(CENTER, CENTER);
+        text("GAME OVER", 400, 260);
+
+        pushMatrix();
+        imageMode(CENTER);
+        image(
+          playerImages.dying[this.frameIndex],
+          this.pos.x,
+          this.pos.y,
+          IMAGESIZE * 3,
+          IMAGESIZE * 3
+        );
+        popMatrix();
       }
     }
 
-    //############################################### SHOCK TRAP OBJECT ##################################
+  //############################################### SHOCK TRAP OBJECT ##################################
 
     class shockTrapObj extends obj {
 
-      constructor(x, y) {  
-        
-        super();
-        this.pos = new PVector(x, y);
-        
-        this.switchImages = shockTrapImages["trap_switch"];
-        this.shockImages = shockTrapImages["shock"];
-
-        this.frameIndex = 0;
-        this.size = IMAGESIZE;
-
-        this.curTime = millis();
-        this.preTime = this.curTime;
-
-        this.state = "TRAP SWITCH";
-
-        this.is_activated = false;
-
-
-      }
-
-      changeFrameIndex() {
-        this.curTime = millis();
-        if (this.curTime - this.preTime > 200) {
-          this.frameIndex++;
-          this.preTime = this.curTime;
-        }
-        if (this.frameIndex > 3) {
-          this.frameIndex = 0;
-        }
-      }
-
-      executeSwitchChange() {
-
-          image(this.switchImages[this.frameIndex], this.pos.x, this.pos.y, this.size * 2, this.size);
-          this.changeFrameIndex();
-          if(this.frameIndex == 3) {
-            this.state = "SHOCK";  
-          }
-      }
-      
-      activate() {
-        this.is_activated = true;
-      }
-
-      executeShock() {
-
-          image(this.switchImages[3], this.pos.x, this.pos.y, this.size * 2, this.size);
-          image(this.shockImages[this.frameIndex], this.pos.x, this.pos.y, this.size * 2, this.size);
+          constructor(x, y) {  
             
-          this.changeFrameIndex();
-      }
+            super();
+            this.pos = new PVector(x, y);
+            
+            this.switchImages = shockTrapImages["trap_switch"];
+            this.shockImages = shockTrapImages["shock"];
     
-      display() {
-        
-        pushMatrix();
-        imageMode(CENTER);
-
-        if(this.is_activated) {
-          switch(this.state) {
-
-            case "TRAP SWITCH":
-                this.executeSwitchChange();
-              break;
-
-            case "SHOCK":
-                this.executeShock();
-              break;
-
+            this.frameIndex = 0;
+            this.size = IMAGESIZE;
+    
+            this.curTime = millis();
+            this.preTime = this.curTime;
+    
+            this.state = "TRAP SWITCH";
+    
+            this.is_activated = false;
+    
+    
           }
-          this.curFrame = frameCount;
-        }
-        else {
-          image(this.switchImages[0], this.pos.x, this.pos.y, this.size * 2, this.size);
-        }
-
-        popMatrix();
-        
-      }
     
-    }
-
-    //############################################### CRUSH TRAP OBJECT ##################################
-
-    class crushTrapObj extends obj {
-  
-      constructor(x, y) {  
-
-        super();
-        this.pos = new PVector(x, y);
-
-        this.crushImages = crushTrapImages;
-       
-        this.frameIndex = 0;
-        this.size = IMAGESIZE * 1.5;
-
-        this.curTime = millis();
-        this.preTime = this.curTime;
-
-        this.is_activated = false;
-
-      }
-
-      changeFrameIndex() {
-
-        this.curTime = millis();
-
-        if (this.curTime - this.preTime > 200) {
-          this.frameIndex++;
-          this.preTime = this.curTime;
-        }
-
-        if (this.frameIndex > 3) {
-          this.frameIndex = 0;
-        }
-        
-      }
-
-      activate() {
-        this.is_activated = true;
-      }
-
-      display() {
-
-        pushMatrix();
-        imageMode(CENTER);
-
-        if(this.is_activated) {
-          image(this.crushImages[this.frameIndex], this.pos.x, this.pos.y, this.size, this.size);
-
-          scale(-1, -1);
-          image(this.crushImages[this.frameIndex], -this.pos.x, -this.pos.y, this.size, this.size);
-
-          this.changeFrameIndex();
-          this.curFrame = frameCount;
-        }
-        else {
-          image(this.crushImages[0], this.pos.x, this.pos.y, this.size, this.size);
-        }
-
-        popMatrix();
-        
-      }
-    }
-
-    //############################################### PARALLAX OBJECT ##################################
-
-    class parallaxObj {
-
-      constructor(image, game, x, y, w, h, loop_condition) {
-        this.pos = new PVector(x, y);
-        this.image = image;
-        this.game = game;
-
-        this.loop_condition = loop_condition
-
-        this.w = w;
-        this.h = h;
-      }
-
-      display(rate) {
-
-        if(this.game.player.state["RUN"]) {
+          changeFrameIndex() {
+            this.curTime = millis();
+            if (this.curTime - this.preTime > 200) {
+              this.frameIndex++;
+              this.preTime = this.curTime;
+            }
+            if (this.frameIndex > 3) {
+              this.frameIndex = 0;
+            }
+          }
+    
+          executeSwitchChange() {
+    
+              image(this.switchImages[this.frameIndex], this.pos.x, this.pos.y, this.size * 2, this.size);
+              this.changeFrameIndex();
+              if(this.frameIndex == 3) {
+                this.state = "SHOCK";  
+              }
+          }
           
-          if(this.game.player.direction["RIGHT"]) {
-            this.pos.x-=rate;
+          activate() {
+            this.is_activated = true;
           }
-          else if(this.game.player.direction["LEFT"]) {
+    
+          executeShock() {
+    
+              image(this.switchImages[3], this.pos.x, this.pos.y, this.size * 2, this.size);
+              image(this.shockImages[this.frameIndex], this.pos.x, this.pos.y, this.size * 2, this.size);
+                
+              this.changeFrameIndex();
+          }
+        
+          display() {
+            
+            pushMatrix();
+            imageMode(CENTER);
+    
+            if(this.is_activated) {
+              switch(this.state) {
+    
+                case "TRAP SWITCH":
+                    this.executeSwitchChange();
+                  break;
+    
+                case "SHOCK":
+                    this.executeShock();
+                  break;
+    
+              }
+              this.curFrame = frameCount;
+            }
+            else {
+              image(this.switchImages[0], this.pos.x, this.pos.y, this.size * 2, this.size);
+            }
+    
+            popMatrix();
+            
+          }
+        
+    }
+    
+  //############################################### CRUSH TRAP OBJECT ##################################
+    
+    class crushTrapObj extends obj {
+      
+          constructor(x, y) {  
+    
+            super();
+            this.pos = new PVector(x, y);
+    
+            this.crushImages = crushTrapImages;
+           
+            this.frameIndex = 0;
+            this.size = IMAGESIZE * 1.5;
+    
+            this.curTime = millis();
+            this.preTime = this.curTime;
+    
+            this.is_activated = false;
+    
+          }
+    
+          changeFrameIndex() {
+    
+            this.curTime = millis();
+    
+            if (this.curTime - this.preTime > 200) {
+              this.frameIndex++;
+              this.preTime = this.curTime;
+            }
+    
+            if (this.frameIndex > 3) {
+              this.frameIndex = 0;
+            }
+            
+          }
+    
+          activate() {
+            this.is_activated = true;
+          }
+    
+          display() {
+    
+            pushMatrix();
+            imageMode(CENTER);
+    
+            if(this.is_activated) {
+              image(this.crushImages[this.frameIndex], this.pos.x, this.pos.y, this.size, this.size);
+    
+              scale(-1, -1);
+              image(this.crushImages[this.frameIndex], -this.pos.x, -this.pos.y, this.size, this.size);
+    
+              this.changeFrameIndex();
+              this.curFrame = frameCount;
+            }
+            else {
+              image(this.crushImages[0], this.pos.x, this.pos.y, this.size, this.size);
+            }
+    
+            popMatrix();
+            
+          }
+    }
+    
+  //############################################### PARALLAX OBJECT ##################################
+    
+    class parallaxObj {
+    
+          constructor(image, game, x, y, w, h, loop_condition) {
+            this.pos = new PVector(x, y);
+            this.image = image;
+            this.game = game;
+    
+            this.loop_condition = loop_condition
+    
+            this.w = w;
+            this.h = h;
+          }
+    
+          display(rate) {
+    
+            if(this.game.player.state["RUN"]) {
+              
+              if(this.game.player.direction["RIGHT"]) {
+                this.pos.x-=rate;
+              }
+              else if(this.game.player.direction["LEFT"]) {
+                this.pos.x+=rate;
+              }
+    
+              if(this.loop_condition) {
+                if(this.pos.x < -150) {
+                  this.pos.x = 6000;
+                  this.pos.y = random(0, 700);
+                }
+    
+                if(this.pos.x > 6000) {
+                  this.pos.x = -150;
+                  this.pos.y = random(0, 700);
+                }
+              }
+            }
+    
+            image(this.image, this.pos.x, this.pos.y, this.w, this.h);
+            
+          }
+    
+          move(rate) {
             this.pos.x+=rate;
           }
-
-          if(this.loop_condition) {
-            if(this.pos.x < -150) {
-              this.pos.x = 6000;
-              this.pos.y = random(0, 700);
-            }
-
-            if(this.pos.x > 6000) {
-              this.pos.x = -150;
-              this.pos.y = random(0, 700);
-            }
-          }
-        }
-
-        image(this.image, this.pos.x, this.pos.y, this.w, this.h);
-        
-      }
-
-      move(rate) {
-        this.pos.x+=rate;
-      }
     }
-    //############################################### KEYPRESSED ######################################
+
+  //############################################### KEYPRESSED ######################################
 
     var keyPressed = function() {
       keyArray[keyCode] = 1;
@@ -1036,9 +1134,10 @@ var sketchProc = function(processingInstance) {
     //############################################### CREATE OBJECT ######################################
 
     var game = new gameObj();
+    var gameOver = new gameOverObj(400, 500);
     game.initGame();
 
-    //############################################### CREATE PARALLAX LAYERS ######################################
+     //############################################### CREATE PARALLAX LAYERS ######################################
 
     var parallaxSpaceLayer = new parallaxObj(parallaxImages[0], game, 0, 200, 2400, 1300, false);
     var parallaxFarStarsLayer = new parallaxObj(parallaxImages[1], game, 0, 200, 2400, 1300, false);
@@ -1046,18 +1145,39 @@ var sketchProc = function(processingInstance) {
 
     //############################################### EXECUTION ######################################
     var draw = function() {
-      
-      parallaxSpaceLayer.display(0.05);
-      parallaxFarStarsLayer.display(0.07);
-      parallaxStation1Layer.display(0.2);
-      
-      pushMatrix();
-      translate(-game.player.pos.x + 400, -game.player.pos.y + 400);
-    
-      game.display();
-      popMatrix();
+      // background(50, 72, 81);
+      if (STATE.GAME) {
 
-      //text(game.player.pos.x, 300, 300);
+        parallaxSpaceLayer.display(0.05);
+        parallaxFarStarsLayer.display(0.07);
+        parallaxStation1Layer.display(0.2);
+
+        rectMode(CENTER);
+        pushMatrix();
+        translate(-game.player.pos.x + 400, -game.player.pos.y + 400);
+        game.display();
+        popMatrix();
+
+        rectMode(LEFT);
+        rect(0, 0, game.player.hp * 16, 50);
+
+        if (game.player.gunType === "sniper") {
+          image(sniperRifle, 133, 25, 40, 40);
+        } else if (game.player.gunType === "flameThrower") {
+          image(flameThrower, 133, 25, 40, 40);
+        }
+
+        image(coinImages[0], 400, 25, 30, 30);
+        image(keyImage, 667, 25, 30, 30);
+        image(keyImage, 697, 25, 30, 30);
+        image(keyImage, 727, 25, 30, 30);
+
+        fill(0, 0, 0, 100);
+        textFont(gameFont, 15);
+        text(20, 420, 30);
+      } else if (STATE.GAMEOVER) {
+        gameOver.display();
+      }
     };
 
     //######################################################################################################
