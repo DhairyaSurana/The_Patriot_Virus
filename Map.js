@@ -2,15 +2,20 @@
 w = wall
 m = monster
 f = flame thrower gun
-s = stair
+b = stair binary
+r = stair ram
 k = key
 e = energy
 n = sniper
-t = string trap
-u = thurnder trap
+s = shock trap
+= = crush trap
+c = collectible item
+g = gound
 */
 
 var tileMap = [
+"wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",
+"wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",
 "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",
 "w                                                                                                         w",
 "w                                              wwwwwwww                                                   w",
@@ -52,10 +57,10 @@ var tileMap = [
 "w   w E w     w                              w           w w                                              w",
 "w   w s w  s  w            sss               w           w  w                                             w",
 "w   w   w     w                              w           w   w                                            w",
-"w   w   w  s  w                sss           w           w    w                                           w",
-"w   w   w     w                              w           w     w                                          w",
-"w   w   w  s  w                              w           w      w                                         w",
-"w   w   w  p  w                              w           w       w                                        w",
+"w   w   w  ss w                sss           w           w    w                                           w",
+"w   w   w  ss w                              w           w     w                                          w",
+"w   w   w     w                              w           w      w                                         w",
+"w   w   w     w                              w           w       w                                        w",
 "w   w   wwwwwww                              w           w        w                                       w",
 "w   w   w     w                              w           w         w                                      w",
 "w   w   w     w                              w           w         w                                      w",
@@ -87,27 +92,25 @@ var tileMap = [
 "w                                                                            w              w             w",
 "w                                                                            w              w             w",
 "w                                                                            wwwwwwwwwwwwwwww             w",
+"w                       wwwwwwwwwwwwww                                                                    w",
 "w                                                                                                         w",
+"w                                                                    b     rrr                            w",
+"w                                                                b                                        w",
+"w                                                            b                                            w",
+"w                                                        b                                                w",
 "w                                                                                                         w",
+"w                                                    b       m                                            w",
 "w                                                                                                         w",
+"w                                                    b                                                    w",
+"w                                                      ALU                                                w",
+"w                                                    bCONTROL  b                                          w",
 "w                                                                                                         w",
-"w                                                                                                         w",
-"w                                                                                                         w",
-"w                                                                                                         w",
-"w                      bbbbbbbbbbb                   bbbbbbbbbbb                                          w",
-"w                      bbbbbbbbbbb                   b         b                                          w",
-"w                      bbbbbbbbbbb                   b         b                                          w",
-"w                      bbbbbbbbbbb                   b ALU     b                                          w",
-"w                      bbbbbbbbbbb                   b CONTROL b                                          w",
-"w                      bbbbbbbbbbb                   b         b                                          w",
-"w                      bbbbbbbbbbb                   b         b                                          w",
-"w                      bbbbbbbbbbb                   b         b                                          w",
-"w                      bbbbbbbbbbb                   bbbbbbbbbbb                                          w",
-"w                   s                                                                                     w",
-"w                 s                                                                                       w",
-"w      m                                                                                                  w",
-"wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",
-"wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",
+"w                     w          m                   b   w                                                w",
+"w                   w    bbbbbbbbbb  w  w  w  wwww           m b                                          w",
+"w        p  r    w       bbbbbbbbbb                  bbbbbbbbbbb                                          w",
+"w        w                                                                                                w",
+"w       ww    w   wwww                                                                                    w",
+"w  c s wwww  m w    =                                         m                                             w",
 "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",
 "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww"
 ];
