@@ -191,6 +191,10 @@ var sketchProc = function(processingInstance) {
           image(stairImage, this.pos.x, this.pos.y, IMAGESIZE, IMAGESIZE);
         } else if (this.name === "binary") {
           image(binaryImage, this.pos.x, this.pos.y, IMAGESIZE, IMAGESIZE);
+        } else if (this.name === "sniper") {
+          image(sniperRifle, this.pos.x, this.pos.y, IMAGESIZE, IMAGESIZE);
+        } else if (this.name === "flameThrower") {
+          image(flameThrower, this.pos.x, this.pos.y, IMAGESIZE, IMAGESIZE);
         } else if (this.name === "energy") {
           image(
             energyImages[this.frameIndex],
@@ -383,6 +387,16 @@ var sketchProc = function(processingInstance) {
                   new crushTrapObj(x * IMAGESIZE, y * IMAGESIZE)
                 );
                 break;
+              case "f":
+                this.objects.push(
+                  new obj(x * IMAGESIZE, y * IMAGESIZE, "flameThrower")
+                );
+                break;
+              case "n":
+                this.objects.push(
+                  new obj(x * IMAGESIZE, y * IMAGESIZE, "sniper")
+                );
+                break;
             }
           }
         }
@@ -430,7 +444,7 @@ var sketchProc = function(processingInstance) {
             ) {
               this.player.pos.x += 2;
             }
-          } else if (this.objects[i].name === "trap") {
+          } else if (this.objects[i].name === "flameThrower") {
             if (
               dist(
                 this.objects[i].pos.x,
@@ -439,9 +453,22 @@ var sketchProc = function(processingInstance) {
                 this.player.pos.y
               ) < 50
             ) {
-              // changePage("SCORE");
+              this.player.changeGun("flameThrower");
+              this.objects[i].removeObj();
             }
-          } else if (this.objects[i].name == "coin") {
+          } else if (this.objects[i].name === "sniper") {
+            if (
+              dist(
+                this.objects[i].pos.x,
+                this.objects[i].pos.y,
+                this.player.pos.x,
+                this.player.pos.y
+              ) < 50
+            ) {
+              this.player.changeGun("sniper");
+              this.objects[i].removeObj();
+            }
+          }  else if (this.objects[i].name == "coin") {
             if (
               dist(
                 this.objects[i].pos.x,
@@ -674,7 +701,7 @@ var sketchProc = function(processingInstance) {
 
         this.gunType = "sniper";
         this.bulletIndex = 0;
-        this.reloadDelay = 1000;
+        this.reloadDelay = 600;
 
         this.state = {
           IDLE: false,
@@ -798,13 +825,13 @@ var sketchProc = function(processingInstance) {
         }
       }
 
-      changeGun(gunType) {
-        this.gunType = gunType;
-        if (gunType === "sniper") {
-          this.reloadDelay = 1000;
+      changeGun(gun) {
+        this.gunType = gun;
+        if (this.gunType === "sniper") {
+          this.reloadDelay = 600;
         }
-        if (guntype === "flameThrower") {
-          this.reloadDelay = 200;
+        if (this.guntype === "flameThrower") {
+          this.reloadDelay = 100;
         }
       }
 
