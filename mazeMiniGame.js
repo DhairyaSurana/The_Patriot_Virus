@@ -433,7 +433,6 @@ var sketchProc=function(processingInstance){ with (processingInstance){
                     switch (this.tilemap[i][j]) {
 
                         case 'w':
-                            
                             this.walls.push(new wall_obj(j*20, i*20, wall_image));
                         break;
 
