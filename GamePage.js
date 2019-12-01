@@ -158,9 +158,29 @@ var sketchProc = function(processingInstance) {
     //############################################### LOAD SOUNDS ######################################
 
     laserSound = new Audio(url + "/sounds/laser.mp3");
+    flameSound = new Audio(url + "/sounds/flame.mp3");
+    jumpSound = new Audio(url + "/sounds/jump.mp3");
+    chargeSound = new Audio(url + "/sounds/charge.mp3");
+    blipSound = new Audio(url + "/sounds/blip.mp3");
+    clangSound = new Audio(url + "/sounds/clang.mp3");        // Crush trap
+    explosionSound = new Audio(url + "/sounds/explosion.mp3");
+    powerUpSound = new Audio(url + "/sounds/powerUp.mp3");
+    keySound = new Audio (url + "/sounds/keyCollected.mp3");
     mainMenuSoundtrack = new Audio(url + "/sounds/mainMenuSoundtrack.mp3");
+
     gameSoundtrack = new Audio(url + "/sounds/gameSoundtrack.mp3");
     gameSoundtrack.volume = 0.2;
+
+    gameOverSoundtrack = new Audio(url + "/sounds/OnThingsToCome.mp3");
+
+    additionMiniGameSoundtrack = new Audio(url + "/sounds/CyberREM.mp3");
+    additionMiniGameSoundtrack.volume = 0.2;  
+    
+    multipleChoiceMiniGameSoundtrack = new Audio(url + "/sounds/Stratosphere.mp3");
+    multipleChoiceMiniGameSoundtrack.volume = 0.2;
+
+    mazeMiniGameSoundtrack = new Audio(url + "/sounds/SectorOffLimits.mp3");
+    mazeMiniGameSoundtrack.volume = 0.2;
 
     var playSound = function(sound) {
       sound.play();
@@ -194,6 +214,21 @@ var sketchProc = function(processingInstance) {
       }
 
       removeObj() {
+        if (this.name === "sniper" || this.name === "flameThrower") {
+          playSound(powerUpSound);
+        } else if (
+          this.name === "miniGame1" ||
+          this.name === "miniGame2" ||
+          this.name === "miniGame3"
+        ) {
+          playSound(keySound);
+        } else if (this.name === "energy") {
+          playSound(chargeSound);
+        } else if (this.name == "trap") {
+
+        } else if (this.name == "coin") {
+          playSound(blipSound);
+        }
         this.pos.set(-1000, -1000);
       }
 
@@ -279,10 +314,13 @@ var sketchProc = function(processingInstance) {
       fired(x, y, direction, gunType) {
         if (gunType === "sniper") {
           this.ammoImage = bulletImages;
+          playSound(laserSound);
         }
 
         if (gunType === "flameThrower") {
           this.ammoImage = flameImages;
+          playSound(flameSound);
+
         }
         this.gunType = gunType;
         this.pos.set(x, y);
@@ -293,9 +331,6 @@ var sketchProc = function(processingInstance) {
 
       display() {
         if (this.shooting) {
-          if (this.frameIndex == 0) {
-            playSound(laserSound);
-          }
 
           this.changeFrameIndex();
           pushMatrix();
@@ -522,7 +557,7 @@ var sketchProc = function(processingInstance) {
               dist(
                 this.objects[i].pos.x,
                 this.objects[i].pos.y,
-                this.player.pos.x,
+                this.player.pos.x,  
                 this.player.pos.y
               ) < 50
             ) {
@@ -590,6 +625,10 @@ var sketchProc = function(processingInstance) {
                 bullets[z].pos.y
               ) < 50
             ) {
+             
+              if(!this.monsters[i].die) {
+                playSound(explosionSound);
+              }
               this.monsters[i].deductHp();
             }
           }
@@ -776,6 +815,8 @@ var sketchProc = function(processingInstance) {
         this.bulletIndex = 0;
         this.reloadDelay = 600;
 
+        this.just_jumped = false;
+
         this.state = {
           IDLE: false,
           RUN: true,
@@ -960,6 +1001,11 @@ var sketchProc = function(processingInstance) {
 
       jump(x) {
         if (this.state.JUMP) {
+
+          if(this.just_jumped) {
+            playSound(jumpSound);
+            this.just_jumped = false;
+          }
           image(
             playerImages.jump[this.frameIndex],
             x,
@@ -999,6 +1045,7 @@ var sketchProc = function(processingInstance) {
         if (keyArray[32] === 1) {
           if (!this.state.JUMP) {
             this.state.JUMP = true;
+            this.just_jumped = true;
             this.applyForce(JUMPFORCE);
           }
         }
@@ -1009,7 +1056,7 @@ var sketchProc = function(processingInstance) {
       }
     }
 
-    //############################################### GAME OVER SCREEN ######################################
+  //############################################### GAME OVER SCREEN ######################################
     class gameOverObj extends obj {
       constructor(x, y) {
         super();
@@ -1033,6 +1080,10 @@ var sketchProc = function(processingInstance) {
       }
 
       display() {
+
+        stopSound(gameSoundtrack);
+        playSound(gameOverSoundtrack);
+
         this.changeColor();
 
         this.changeFrameIndex();
@@ -1195,6 +1246,10 @@ var sketchProc = function(processingInstance) {
         imageMode(CENTER);
 
         if (this.is_activated) {
+
+          // if(this.frameIndex == 3) {
+          //   //playSound(clangSound);
+          // }
           image(
             this.crushImages[this.frameIndex],
             this.pos.x,
@@ -1304,6 +1359,7 @@ var sketchProc = function(processingInstance) {
       }
 
       display() {
+
         if (
           this.is_question == false &&
           mouseX >= this.x &&
@@ -1386,12 +1442,16 @@ var sketchProc = function(processingInstance) {
         this.is_correct = this.answer == this.actual_answer;
         if (this.is_correct) {
           changePage("GAME");
+          stopSound(multipleChoiceMiniGameSoundtrack);
           collectedItems.key++;
           this.reset();
         }
       }
 
       display() {
+        stopSound(gameSoundtrack);
+        playSound(multipleChoiceMiniGameSoundtrack);
+
         image(miniGameBackgroundImage1, 400, 400, 800, 800);
         this.currentTime = millis();
 
@@ -1593,6 +1653,9 @@ var sketchProc = function(processingInstance) {
       }
 
       display() {
+        stopSound(gameSoundtrack);
+        playSound(additionMiniGameSoundtrack);
+
         image(miniGameBackgroundImage2, 400, 400, 800, 800);
 
         this.question_box.display();
@@ -1613,6 +1676,7 @@ var sketchProc = function(processingInstance) {
             fill(0, 255, 0);
             text("CORRECT", 400, 650);
             changePage("GAME");
+            stopSound(additionMiniGameSoundtrack);
             collectedItems.key++;
             this.reset();
           } else {
@@ -1979,6 +2043,8 @@ var sketchProc = function(processingInstance) {
       }
 
       display() {
+        stopSound(gameSoundtrack);
+        playSound(mazeMiniGameSoundtrack);
         if (!this.game_won && !this.game_over) {
           this.currentTime = millis();
 
@@ -2006,6 +2072,7 @@ var sketchProc = function(processingInstance) {
           textSize(50);
           text("GAME WON", 250, 400);
           changePage("GAME");
+          stopSound(mazeMiniGameSoundtrack);
           collectedItems.key++;
           this.reset();
           // Add ChangePage here
