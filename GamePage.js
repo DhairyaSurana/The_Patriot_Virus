@@ -10,10 +10,18 @@ var sketchProc = function(processingInstance) {
     STATE = {
       OPEN: false,
       GAME: true,
+      MUTIPLECHOICE: false,
+      ADDITION: false,
+      THEMAZE: false,
       INSTRUCTION: false,
       SCORE: false,
       ACHIEVEMENT: false,
       GAMEOVER: false
+    };
+
+    var collectedItems = {
+      coins: 0,
+      key: 0
     };
 
     var changePage = function changePage(page) {
@@ -139,6 +147,10 @@ var sketchProc = function(processingInstance) {
     stairImage = loadImage(url + "/images/ram.png");
     mbImage = loadImage(url + "/images/motherboard.png");
 
+    miniGameBackgroundImage1 = loadImage(url + "/images/digitalBackground.png");
+    miniGameBackgroundImage2 = loadImage(
+      url + "/images/digitalBackground2.png"
+    );
     //############################################### LOAD SOUNDS ######################################
 
     laserSound = new Audio(url + "/sounds/laser.mp3");
@@ -195,6 +207,12 @@ var sketchProc = function(processingInstance) {
           image(sniperRifle, this.pos.x, this.pos.y, IMAGESIZE, IMAGESIZE);
         } else if (this.name === "flameThrower") {
           image(flameThrower, this.pos.x, this.pos.y, IMAGESIZE, IMAGESIZE);
+        } else if (
+          this.name === "miniGame1" ||
+          this.name === "miniGame2" ||
+          this.name === "miniGame3"
+        ) {
+          image(keyImage, this.pos.x, this.pos.y, IMAGESIZE, IMAGESIZE);
         } else if (this.name === "energy") {
           image(
             energyImages[this.frameIndex],
@@ -354,13 +372,25 @@ var sketchProc = function(processingInstance) {
                   new obj(x * IMAGESIZE, y * IMAGESIZE, "binary")
                 );
                 break;
+              case "1":
+                this.objects.push(
+                  new obj(x * IMAGESIZE, y * IMAGESIZE, "miniGame1")
+                );
+                break;
+              case "2":
+                this.objects.push(
+                  new obj(x * IMAGESIZE, y * IMAGESIZE, "miniGame2")
+                );
+                break;
+              case "3":
+                this.objects.push(
+                  new obj(x * IMAGESIZE, y * IMAGESIZE, "miniGame3")
+                );
+                break;
               case "t":
                 this.objects.push(
                   new obj(x * IMAGESIZE, y * IMAGESIZE, "trap")
                 );
-                break;
-              case "p":
-                this.player.setPos(x * IMAGESIZE, y * IMAGESIZE);
                 break;
               case "c":
                 this.objects.push(
@@ -370,6 +400,16 @@ var sketchProc = function(processingInstance) {
               case "e":
                 this.objects.push(
                   new obj(x * IMAGESIZE, y * IMAGESIZE, "energy")
+                );
+                break;
+              case "f":
+                this.objects.push(
+                  new obj(x * IMAGESIZE, y * IMAGESIZE, "flameThrower")
+                );
+                break;
+              case "n":
+                this.objects.push(
+                  new obj(x * IMAGESIZE, y * IMAGESIZE, "sniper")
                 );
                 break;
               case "m":
@@ -387,15 +427,8 @@ var sketchProc = function(processingInstance) {
                   new crushTrapObj(x * IMAGESIZE, y * IMAGESIZE)
                 );
                 break;
-              case "f":
-                this.objects.push(
-                  new obj(x * IMAGESIZE, y * IMAGESIZE, "flameThrower")
-                );
-                break;
-              case "n":
-                this.objects.push(
-                  new obj(x * IMAGESIZE, y * IMAGESIZE, "sniper")
-                );
+              case "p":
+                this.player.setPos(x * IMAGESIZE, y * IMAGESIZE);
                 break;
             }
           }
@@ -468,7 +501,7 @@ var sketchProc = function(processingInstance) {
               this.player.changeGun("sniper");
               this.objects[i].removeObj();
             }
-          }  else if (this.objects[i].name == "coin") {
+          } else if (this.objects[i].name == "coin") {
             if (
               dist(
                 this.objects[i].pos.x,
@@ -477,7 +510,7 @@ var sketchProc = function(processingInstance) {
                 this.player.pos.y
               ) < 50
             ) {
-              //TODO: add score
+              collectedItems.coins++;
               this.objects[i].removeObj();
             }
           } else if (this.objects[i].name == "energy") {
@@ -490,6 +523,42 @@ var sketchProc = function(processingInstance) {
               ) < 50
             ) {
               this.player.recoverHP();
+              this.objects[i].removeObj();
+            }
+          } else if (this.objects[i].name == "miniGame1") {
+            if (
+              dist(
+                this.objects[i].pos.x,
+                this.objects[i].pos.y,
+                this.player.pos.x,
+                this.player.pos.y
+              ) < 50
+            ) {
+              changePage("MUTIPLECHOICE");
+              this.objects[i].removeObj();
+            }
+          } else if (this.objects[i].name == "miniGame2") {
+            if (
+              dist(
+                this.objects[i].pos.x,
+                this.objects[i].pos.y,
+                this.player.pos.x,
+                this.player.pos.y
+              ) < 50
+            ) {
+              changePage("ADDITION");
+              this.objects[i].removeObj();
+            }
+          } else if (this.objects[i].name == "miniGame3") {
+            if (
+              dist(
+                this.objects[i].pos.x,
+                this.objects[i].pos.y,
+                this.player.pos.x,
+                this.player.pos.y
+              ) < 50
+            ) {
+              changePage("THEMAZE");
               this.objects[i].removeObj();
             }
           }
@@ -1198,20 +1267,481 @@ var sketchProc = function(processingInstance) {
       }
     }
 
+    //############################################### MULTIPLE CHOICE MINI GAME SCREEN  ######################################
+
+    //                                       _______ TEXT BOX OBJECT__________
+    class textBoxObj {
+      constructor(str, x, y, w, h, is_question) {
+        this.str = str;
+
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+
+        this.is_question = is_question;
+        this.is_clicked = false;
+      }
+
+      getX() {
+        return this.x;
+      }
+
+      getY() {
+        return this.y;
+      }
+
+      getWidth() {
+        return this.w;
+      }
+
+      getHeight() {
+        return this.h;
+      }
+
+      display() {
+        if (
+          this.is_question == false &&
+          mouseX >= this.x &&
+          mouseX <= this.x + this.w &&
+          mouseY >= this.y &&
+          mouseY <= this.y + this.h
+        ) {
+          fill(155, 155, 0);
+        } else {
+          fill(0, 0, 0);
+        }
+
+        if (!this.is_question && this.is_clicked) {
+          fill(255, 0, 0);
+        }
+
+        rect(this.x, this.y, this.w, this.h);
+
+        fill(255);
+
+        textFont(gameFont, 20);
+
+        textAlign(CENTER, CENTER);
+        text(this.str, this.x + this.w / 2, this.y + this.h / 2);
+      }
+
+      setText(str) {
+        this.str = str;
+      }
+
+      reset() {
+        this.is_clicked = false;
+      
+      }
+    }
+
+    //                                          _______ MULITPLE CHOICE MINI GAME OBJECT__________
+    class multipleChoiceMiniGameObj {
+      constructor() {
+        this.question_box = new textBoxObj(
+          "Calculate the following: 4A6 + 1B3 =",
+          50,
+          50,
+          700,
+          150,
+          true
+        );
+
+        this.top_left_box = new textBoxObj("659", 50, 250, 300, 100, false);
+        this.top_right_box = new textBoxObj("123", 450, 250, 300, 100, false);
+        this.bottom_left_box = new textBoxObj("7C2", 50, 450, 300, 100, false);
+        this.bottom_right_box = new textBoxObj(
+          "H45",
+          450,
+          450,
+          300,
+          100,
+          false
+        );
+
+        this.answer = "";
+        this.actual_answer = "659";
+
+        this.is_correct = false;
+        this.is_clicked = false;
+      }
+
+      getClickStatus() {
+        return this.is_clicked;
+      }
+
+      setClickStatus(bool_value) {
+        this.is_clicked = bool_value;
+      }
+
+      selectOption(text_box) {
+        this.answer = text_box.str;
+        text_box.is_clicked = true;
+        this.clickedTime = millis();
+
+        this.is_correct = this.answer == this.actual_answer;
+        if (this.is_correct) {
+          changePage("GAME");
+          collectedItems.key++;
+          this.reset();
+        }
+      }
+
+      display() {
+        image(miniGameBackgroundImage1, 400, 400, 800, 800);
+        this.currentTime = millis();
+
+        this.question_box.display();
+
+        this.top_left_box.display();
+        this.top_right_box.display();
+        this.bottom_left_box.display();
+        this.bottom_right_box.display();
+
+        if (this.is_clicked) {
+          textFont(gameFont, 20);
+          if (this.is_correct) {
+            fill(0, 255, 0);
+            text("CORRECT", 400, 650);
+          } else {
+            fill(255, 0, 0);
+            text("WRONG", 400, 650);
+
+            console.log("CT: " + this.currentTime);
+            if (this.currentTime - this.clickedTime >= 100) {
+              this.reset();
+              console.log(true);
+            }
+          }
+        }
+
+        fill(255, 255, 255);
+        textFont(gameFont, 10);
+        text("Good Luck", 400, 700);
+      }
+
+      reset() {
+        //this.selected_box = null;
+        this.currentTime = 0;
+        this.is_clicked = false;
+        this.is_correct = false;
+
+        this.top_left_box.reset();
+        this.top_right_box.reset();
+        this.bottom_left_box.reset();
+        this.bottom_right_box.reset();
+
+        this.answer = "";
+      }
+    }
+    //############################################### MINI GAME ADDITION SCREENS  ######################################
+
+    //                                       _______ USER INPUT BOX OBJECT__________
+    class userInputBoxObj {
+      constructor(x, y, w, h) {
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+        this.initialText = "Enter: ";
+        this.input = "";
+        this.is_clicked = false;
+      }
+
+      setClickStatus(bool_value) {
+        this.is_clicked = bool_value;
+      }
+
+      checkClickStatus() {
+        return this.is_clicked;
+      }
+
+      clearInitialText() {
+        this.initialText = "";
+      }
+
+      storeInput(input) {
+        this.input = input;
+      }
+
+      display(time) {
+        rect(this.x, this.y, this.w, this.h);
+
+        fill(0, 0, 0);
+        textAlign(CENTER, CENTER);
+
+        if (time > 0) {
+          if (this.is_clicked) {
+            if (frameCount % 30 != 0) {
+              text(this.input + "|", this.x + this.w / 2, this.y + this.h / 2);
+            } else {
+              text(this.input + " ", this.x + this.w / 2, this.y + this.h / 2);
+            }
+          } else {
+            text(this.initialText, this.x + this.w / 2, this.y + this.h / 2);
+          }
+        }
+      }
+
+      reset() {
+        this.input = "";
+        this.initialText = "Enter: ";
+        this.is_clicked = false;
+      }
+    }
+
+    //                                       _______ TIMER OBJECT__________
+    class timerObj {
+      constructor(limit, x, y) {
+        this.limit = limit;
+        this.current_sec = this.limit;
+
+        this.x = x;
+        this.y = y;
+
+        this.is_paused = false;
+      }
+
+      getTime() {
+        return this.current_sec;
+      }
+
+      pauseTime() {
+        this.is_paused = true;
+      }
+
+      countDown() {
+        if (this.current_sec > 0 && !this.is_paused) {
+          this.current_sec -= 1 / 60;
+        }
+      }
+
+      display() {
+        this.countDown();
+
+        if (this.current_sec > this.limit * (2 / 3)) {
+          fill(0, 255, 0);
+        } else if (this.current_sec > this.limit * (1 / 3)) {
+          fill(255, 255, 0);
+        } else {
+          fill(255, 0, 0);
+        }
+
+        textSize(50);
+        text(this.current_sec, this.x, this.y);
+      }
+
+      reset() {
+        this.current_sec = this.limit;
+        this.is_paused = false;
+      }
+    }
+
+    //                                       _______ ADDITION MINI GAME OBJECT__________
+    class additionMiniGameObj {
+      constructor() {
+        this.timer = new timerObj(10, 700, 50);
+        this.num1 = round(random(10, 50));
+        this.num2 = round(random(10, 50));
+        this.question_box = new textBoxObj(
+          "Calculate the following: " + this.num1 + " + " + this.num2 + " =",
+          50,
+          150,
+          700,
+          150,
+          true
+        );
+        this.input_box = new userInputBoxObj(50, 400, 700, 150);
+        this.answer = "";
+
+        this.userInput = "";
+
+        this.actual_answer = str(this.num1 + this.num2);
+
+        this.is_correct = false;
+        this.is_enter_pressed = false;
+      }
+
+      checkInputBoxClickStatus() {
+        return this.input_box.checkClickStatus();
+      }
+
+      setInputBoxClickStatus(bool_value) {
+        this.input_box.setClickStatus(bool_value);
+      }
+
+      getTime() {
+        return this.timer.getTime();
+      }
+
+      getEnterStatus() {
+        return this.is_enter_pressed;
+      }
+      setEnterStatus(bool_value) {
+        this.is_enter_pressed = bool_value;
+      }
+
+      storeCurrentInput() {
+        this.input_box.storeInput(this.userInput);
+      }
+
+      checkActualAnswer() {
+        this.answer = this.input_box.input;
+        this.is_correct = this.answer == this.actual_answer ? true : false;
+      }
+
+      display() {
+        image(miniGameBackgroundImage2, 400, 400, 800, 800);
+
+        this.question_box.display();
+        this.input_box.display(this.timer.getTime());
+
+        this.timer.display();
+
+        fill(255, 255, 255);
+        textFont(gameFont, 10);
+        text("Press left arrow to delete", 400, 700);
+        text("Press r to reset the game", 400, 720);
+
+        if (this.is_enter_pressed) {
+          this.timer.pauseTime();
+
+          textFont(gameFont, 20);
+          if (this.is_correct) {
+            fill(0, 255, 0);
+            text("CORRECT", 400, 650);
+            changePage("GAME");
+            collectedItems.key++;
+            this.reset();
+          } else {
+            fill(255, 0, 0);
+            text("WRONG", 400, 650);
+          }
+        }
+      }
+
+      reset() {
+        this.num1 = round(random(10, 50));
+        this.num2 = round(random(10, 50));
+        this.actual_answer = str(this.num1 + this.num2);
+
+        this.timer.reset();
+
+        this.input_box.reset();
+        this.question_box.setText(
+          "Calculate the following: " + this.num1 + " + " + this.num2 + " ="
+        );
+
+        this.is_correct = false;
+        this.is_enter_pressed = false;
+
+        this.userInput = "";
+      }
+    }
     //############################################### KEYPRESSED ######################################
 
     var keyPressed = function() {
-      keyArray[keyCode] = 1;
+      if (STATE.GAME) {
+        keyArray[keyCode] = 1;
+      }
+
+      if (STATE.ADDITION) {
+        if (keyCode === 82) {
+          additionMiniGameScreen.reset();
+        }
+
+        if (key.toString() == "\n") {
+          additionMiniGameScreen.setEnterStatus(true);
+          additionMiniGameScreen.checkActualAnswer();
+        } else if (
+          additionMiniGameScreen.getTime() > 0 &&
+          !additionMiniGameScreen.getEnterStatus() &&
+          additionMiniGameScreen.checkInputBoxClickStatus()
+        ) {
+          if (!isNaN(key.toString())) {
+            additionMiniGameScreen.userInput += key.toString();
+          }
+
+          if (keyCode === LEFT && additionMiniGameScreen.userInput.length > 0) {
+            additionMiniGameScreen.userInput = additionMiniGameScreen.userInput.substring(
+              0,
+              additionMiniGameScreen.userInput.length - 1
+            );
+          }
+
+          additionMiniGameScreen.storeCurrentInput();
+        }
+      }
     };
 
     var keyReleased = function() {
       keyArray[keyCode] = 0;
     };
 
+    //############################################### MOUSE CLICKED ######################################
+    var mouseClicked = function() {
+      if (STATE.ADDITION) {
+        additionMiniGameScreen.setInputBoxClickStatus(true);
+      }
+
+      if (STATE.MUTIPLECHOICE) {
+        if (!multipleChoiceMiniGameScreen.getClickStatus()) {
+          var top_left_box = multipleChoiceMiniGameScreen.top_left_box;
+          var top_right_box = multipleChoiceMiniGameScreen.top_right_box;
+          var bottom_left_box = multipleChoiceMiniGameScreen.bottom_left_box;
+          var bottom_right_box = multipleChoiceMiniGameScreen.bottom_right_box;
+
+          if (
+            mouseX >= top_left_box.getX() &&
+            mouseX <= top_left_box.getX() + top_left_box.getWidth() &&
+            mouseY >= top_left_box.getY() &&
+            mouseY <= top_left_box.getY() + top_left_box.getHeight()
+          ) {
+            multipleChoiceMiniGameScreen.selectOption(top_left_box);
+            multipleChoiceMiniGameScreen.setClickStatus(true);
+          }
+
+          if (
+            mouseX >= top_right_box.getX() &&
+            mouseX <= top_right_box.getX() + top_right_box.getWidth() &&
+            mouseY >= top_right_box.getY() &&
+            mouseY <= top_right_box.getY() + top_right_box.getHeight()
+          ) {
+            multipleChoiceMiniGameScreen.selectOption(top_right_box);
+            multipleChoiceMiniGameScreen.setClickStatus(true);
+          }
+
+          if (
+            mouseX >= bottom_left_box.getX() &&
+            mouseX <= bottom_left_box.getX() + bottom_left_box.getWidth() &&
+            mouseY >= bottom_left_box.getY() &&
+            mouseY <= bottom_left_box.getY() + bottom_left_box.getHeight()
+          ) {
+            multipleChoiceMiniGameScreen.selectOption(bottom_left_box);
+            multipleChoiceMiniGameScreen.setClickStatus(true);
+          }
+
+          if (
+            mouseX >= bottom_right_box.getX() &&
+            mouseX <= bottom_right_box.getX() + bottom_right_box.getWidth() &&
+            mouseY >= bottom_right_box.getY() &&
+            mouseY <= bottom_right_box.getY() + bottom_right_box.getHeight()
+          ) {
+            multipleChoiceMiniGameScreen.selectOption(bottom_right_box);
+            multipleChoiceMiniGameScreen.setClickStatus(true);
+          }
+        }
+      }
+    };
+
     //############################################### CREATE OBJECT ######################################
 
     var game = new gameObj();
     var gameOver = new gameOverObj(400, 500);
+    var multipleChoiceMiniGameScreen = new multipleChoiceMiniGameObj();
+    var additionMiniGameScreen = new additionMiniGameObj();
+
     game.initGame();
 
     //############################################### CREATE PARALLAX LAYERS ######################################
@@ -1269,13 +1799,20 @@ var sketchProc = function(processingInstance) {
         }
 
         image(coinImages[0], 400, 25, 30, 30);
-        image(keyImage, 667, 25, 30, 30);
-        image(keyImage, 697, 25, 30, 30);
-        image(keyImage, 727, 25, 30, 30);
+
+        for (let i = 0; i < collectedItems.key; i++) {
+          image(keyImage, 637 + 30 * i, 25, 30, 30);
+        }
 
         fill(0, 0, 0, 100);
         textFont(gameFont, 15);
-        text(20, 420, 30);
+        textAlign(CENTER, CENTER);
+        text(collectedItems.coins, 430, 25);
+      } else if (STATE.MUTIPLECHOICE) {
+        multipleChoiceMiniGameScreen.display();
+      } else if (STATE.ADDITION) {
+        additionMiniGameScreen.display();
+      } else if (STATE.THEMAZE) {
       } else if (STATE.GAMEOVER) {
         gameOver.display();
       }
