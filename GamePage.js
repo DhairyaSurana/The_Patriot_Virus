@@ -30,7 +30,7 @@ var sketchProc = function(processingInstance) {
       }
       STATE[page] = true;
     };
-    const IMAGESIZE = 50;
+    const GAMEIMGSIZE = 50;
 
     //############################################### LOAD IMAGES ######################################
 
@@ -165,7 +165,7 @@ var sketchProc = function(processingInstance) {
     clangSound = new Audio(url + "/sounds/clang.mp3");        // Crush trap
     explosionSound = new Audio(url + "/sounds/explosion.mp3");
     powerUpSound = new Audio(url + "/sounds/powerUp.mp3");
-
+    keySound = new Audio (url + "/sounds/keyCollected.mp3");
     mainMenuSoundtrack = new Audio(url + "/sounds/mainMenuSoundtrack.mp3");
 
     gameSoundtrack = new Audio(url + "/sounds/gameSoundtrack.mp3");
@@ -214,6 +214,21 @@ var sketchProc = function(processingInstance) {
       }
 
       removeObj() {
+        if (this.name === "sniper" || this.name === "flameThrower") {
+          playSound(powerUpSound);
+        } else if (
+          this.name === "miniGame1" ||
+          this.name === "miniGame2" ||
+          this.name === "miniGame3"
+        ) {
+          playSound(keySound);
+        } else if (this.name === "energy") {
+          playSound(chargeSound);
+        } else if (this.name == "trap") {
+
+        } else if (this.name == "coin") {
+          playSound(blipSound);
+        }
         this.pos.set(-1000, -1000);
       }
 
@@ -222,44 +237,44 @@ var sketchProc = function(processingInstance) {
         pushMatrix();
         imageMode(CENTER);
         if (this.name === "wall") {
-          image(wireImage, this.pos.x, this.pos.y, IMAGESIZE, IMAGESIZE);
+          image(wireImage, this.pos.x, this.pos.y, GAMEIMGSIZE, GAMEIMGSIZE);
         } else if (this.name === "stair") {
-          image(stairImage, this.pos.x, this.pos.y, IMAGESIZE, IMAGESIZE);
+          image(stairImage, this.pos.x, this.pos.y, GAMEIMGSIZE, GAMEIMGSIZE);
         } else if (this.name === "binary") {
-          image(binaryImage, this.pos.x, this.pos.y, IMAGESIZE, IMAGESIZE);
+          image(binaryImage, this.pos.x, this.pos.y, GAMEIMGSIZE, GAMEIMGSIZE);
         } else if (this.name === "sniper") {
-          image(sniperRifle, this.pos.x, this.pos.y, IMAGESIZE, IMAGESIZE);
+          image(sniperRifle, this.pos.x, this.pos.y, GAMEIMGSIZE, GAMEIMGSIZE);
         } else if (this.name === "flameThrower") {
-          image(flameThrower, this.pos.x, this.pos.y, IMAGESIZE, IMAGESIZE);
+          image(flameThrower, this.pos.x, this.pos.y, GAMEIMGSIZE, GAMEIMGSIZE);
         } else if (
           this.name === "miniGame1" ||
           this.name === "miniGame2" ||
           this.name === "miniGame3"
         ) {
-          image(keyImage, this.pos.x, this.pos.y, IMAGESIZE, IMAGESIZE);
+          image(keyImage, this.pos.x, this.pos.y, GAMEIMGSIZE, GAMEIMGSIZE);
         } else if (this.name === "energy") {
           image(
             energyImages[this.frameIndex],
             this.pos.x,
             this.pos.y,
-            IMAGESIZE,
-            IMAGESIZE
+            GAMEIMGSIZE,
+            GAMEIMGSIZE
           );
         } else if (this.name == "trap") {
           image(
             trapImages[this.frameIndex],
             this.pos.x,
             this.pos.y,
-            IMAGESIZE,
-            IMAGESIZE
+            GAMEIMGSIZE,
+            GAMEIMGSIZE
           );
         } else if (this.name == "coin") {
           image(
             coinImages[this.frameIndex],
             this.pos.x,
             this.pos.y,
-            IMAGESIZE,
-            IMAGESIZE
+            GAMEIMGSIZE,
+            GAMEIMGSIZE
           );
         }
         popMatrix();
@@ -299,10 +314,13 @@ var sketchProc = function(processingInstance) {
       fired(x, y, direction, gunType) {
         if (gunType === "sniper") {
           this.ammoImage = bulletImages;
+          playSound(laserSound);
         }
 
         if (gunType === "flameThrower") {
           this.ammoImage = flameImages;
+          playSound(flameSound);
+
         }
         this.gunType = gunType;
         this.pos.set(x, y);
@@ -313,17 +331,6 @@ var sketchProc = function(processingInstance) {
 
       display() {
         if (this.shooting) {
-          if (this.frameIndex == 0) {
-           
-            if(this.gunType === "sniper") {
-              playSound(laserSound);
-            }
-
-            else if(this.gunType === "flameThrower") {
-              playSound(flameSound);
-            }
-
-          }
 
           this.changeFrameIndex();
           pushMatrix();
@@ -333,16 +340,16 @@ var sketchProc = function(processingInstance) {
               this.ammoImage[this.frameIndex],
               -this.pos.x,
               this.pos.y,
-              IMAGESIZE,
-              IMAGESIZE
+              GAMEIMGSIZE,
+              GAMEIMGSIZE
             );
           } else {
             image(
               this.ammoImage[this.frameIndex],
               this.pos.x,
               this.pos.y,
-              IMAGESIZE,
-              IMAGESIZE
+              GAMEIMGSIZE,
+              GAMEIMGSIZE
             );
           }
           popMatrix();
@@ -391,76 +398,76 @@ var sketchProc = function(processingInstance) {
             switch (tileMap[y][x]) {
               case "w":
                 this.objects.push(
-                  new obj(x * IMAGESIZE, y * IMAGESIZE, "wall")
+                  new obj(x * GAMEIMGSIZE, y * GAMEIMGSIZE, "wall")
                 );
                 break;
               case "r":
                 this.objects.push(
-                  new obj(x * IMAGESIZE, y * IMAGESIZE, "stair")
+                  new obj(x * GAMEIMGSIZE, y * GAMEIMGSIZE, "stair")
                 );
                 break;
               case "b":
                 this.objects.push(
-                  new obj(x * IMAGESIZE, y * IMAGESIZE, "binary")
+                  new obj(x * GAMEIMGSIZE, y * GAMEIMGSIZE, "binary")
                 );
                 break;
               case "1":
                 this.objects.push(
-                  new obj(x * IMAGESIZE, y * IMAGESIZE, "miniGame1")
+                  new obj(x * GAMEIMGSIZE, y * GAMEIMGSIZE, "miniGame1")
                 );
                 break;
               case "2":
                 this.objects.push(
-                  new obj(x * IMAGESIZE, y * IMAGESIZE, "miniGame2")
+                  new obj(x * GAMEIMGSIZE, y * GAMEIMGSIZE, "miniGame2")
                 );
                 break;
               case "3":
                 this.objects.push(
-                  new obj(x * IMAGESIZE, y * IMAGESIZE, "miniGame3")
+                  new obj(x * GAMEIMGSIZE, y * GAMEIMGSIZE, "miniGame3")
                 );
                 break;
               case "t":
                 this.objects.push(
-                  new obj(x * IMAGESIZE, y * IMAGESIZE, "trap")
+                  new obj(x * GAMEIMGSIZE, y * GAMEIMGSIZE, "trap")
                 );
                 break;
               case "c":
                 this.objects.push(
-                  new obj(x * IMAGESIZE, y * IMAGESIZE, "coin")
+                  new obj(x * GAMEIMGSIZE, y * GAMEIMGSIZE, "coin")
                 );
                 break;
               case "e":
                 this.objects.push(
-                  new obj(x * IMAGESIZE, y * IMAGESIZE, "energy")
+                  new obj(x * GAMEIMGSIZE, y * GAMEIMGSIZE, "energy")
                 );
                 break;
               case "f":
                 this.objects.push(
-                  new obj(x * IMAGESIZE, y * IMAGESIZE, "flameThrower")
+                  new obj(x * GAMEIMGSIZE, y * GAMEIMGSIZE, "flameThrower")
                 );
                 break;
               case "n":
                 this.objects.push(
-                  new obj(x * IMAGESIZE, y * IMAGESIZE, "sniper")
+                  new obj(x * GAMEIMGSIZE, y * GAMEIMGSIZE, "sniper")
                 );
                 break;
               case "m":
                 this.monsters.push(
-                  new monsterObj(x * IMAGESIZE, y * IMAGESIZE)
+                  new monsterObj(x * GAMEIMGSIZE, y * GAMEIMGSIZE)
                 );
                 break;
               case "s":
                 this.shockTraps.push(
-                  new shockTrapObj(x * IMAGESIZE, y * IMAGESIZE)
+                  new shockTrapObj(x * GAMEIMGSIZE, y * GAMEIMGSIZE)
                 );
                 break;
               case "=":
                 this.crushTraps.push(
-                  new crushTrapObj(x * IMAGESIZE, y * IMAGESIZE)
+                  new crushTrapObj(x * GAMEIMGSIZE, y * GAMEIMGSIZE)
                 );
                 break;
               case "p":
-                this.player.setPos(x * IMAGESIZE, y * IMAGESIZE);
+                this.player.setPos(x * GAMEIMGSIZE, y * GAMEIMGSIZE);
                 break;
             }
           }
@@ -488,7 +495,7 @@ var sketchProc = function(processingInstance) {
               this.player.pos.y + 25 <= this.objects[i].pos.y - 25
             ) {
               // GROUND COLLISION
-              this.player.updateGroundLv(this.objects[i].pos.y - IMAGESIZE);
+              this.player.updateGroundLv(this.objects[i].pos.y - GAMEIMGSIZE);
               break;
             } else {
               this.player.groundLv = 1000;
@@ -722,16 +729,16 @@ var sketchProc = function(processingInstance) {
             monsterImages[this.frameIndex],
             -this.pos.x,
             this.pos.y,
-            IMAGESIZE,
-            IMAGESIZE
+            GAMEIMGSIZE,
+            GAMEIMGSIZE
           );
         } else {
           image(
             monsterImages[this.frameIndex],
             this.pos.x,
             this.pos.y,
-            IMAGESIZE,
-            IMAGESIZE
+            GAMEIMGSIZE,
+            GAMEIMGSIZE
           );
         }
         popMatrix();
@@ -952,8 +959,8 @@ var sketchProc = function(processingInstance) {
             playerImages.idle[this.frameIndex],
             x,
             this.pos.y,
-            IMAGESIZE,
-            IMAGESIZE
+            GAMEIMGSIZE,
+            GAMEIMGSIZE
           );
         }
       }
@@ -964,8 +971,8 @@ var sketchProc = function(processingInstance) {
             playerImages.run[this.frameIndex],
             x,
             this.pos.y,
-            IMAGESIZE,
-            IMAGESIZE
+            GAMEIMGSIZE,
+            GAMEIMGSIZE
           );
         }
       }
@@ -1007,8 +1014,8 @@ var sketchProc = function(processingInstance) {
             playerImages.jump[this.frameIndex],
             x,
             this.pos.y,
-            IMAGESIZE,
-            IMAGESIZE
+            GAMEIMGSIZE,
+            GAMEIMGSIZE
           );
         }
       }
@@ -1098,8 +1105,8 @@ var sketchProc = function(processingInstance) {
           playerImages.dying[this.frameIndex],
           this.pos.x,
           this.pos.y,
-          IMAGESIZE * 3,
-          IMAGESIZE * 3
+          GAMEIMGSIZE * 3,
+          GAMEIMGSIZE * 3
         );
         popMatrix();
       }
@@ -1116,7 +1123,7 @@ var sketchProc = function(processingInstance) {
         this.shockImages = shockTrapImages["shock"];
 
         this.frameIndex = 0;
-        this.size = IMAGESIZE;
+        this.size = GAMEIMGSIZE;
 
         this.curTime = millis();
         this.preTime = this.curTime;
@@ -1213,7 +1220,7 @@ var sketchProc = function(processingInstance) {
         this.crushImages = crushTrapImages;
 
         this.frameIndex = 0;
-        this.size = IMAGESIZE * 1.5;
+        this.size = GAMEIMGSIZE * 1.5;
 
         this.curTime = millis();
         this.preTime = this.curTime;
