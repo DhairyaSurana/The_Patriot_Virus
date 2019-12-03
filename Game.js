@@ -69,7 +69,7 @@ var sketchProc = function (processingInstance) {
       loadImage(url + "/images/r6f4.png"),
       loadImage(url + "/images/r6f5.png")
     ];
-    astroImages = {
+    playerImages = {
       idle: [
         loadImage(url + "/images/standf1.png"),
         loadImage(url + "/images/standf2.png"),
@@ -82,7 +82,12 @@ var sketchProc = function (processingInstance) {
         loadImage(url + "/images/runf3.png"),
         loadImage(url + "/images/runf4.png")
       ],
-      recoil: [loadImage(url + "/images/shootf1.png")],
+      recoil: [
+        loadImage(url + "/images/recoilf1.png"),
+        loadImage(url + "/images/recoilf2.png"),
+        loadImage(url + "/images/recoilf3.png"),
+        loadImage(url + "/images/recoilf4.png")
+      ],
       dying: [
         loadImage(url + "/images/standf1.png"),
         loadImage(url + "/images/dyingf1.png"),
@@ -183,9 +188,7 @@ var sketchProc = function (processingInstance) {
     wallImage = loadImage("./images/sciFiWall.png");
 
     miniGameBackgroundImage1 = loadImage(url + "/images/digitalBackground.png");
-    miniGameBackgroundImage2 = loadImage(
-      url + "/images/digitalBackground2.png"
-    );
+    miniGameBackgroundImage2 = loadImage(url + "/images/digitalBackground2.png");
 
     //############################################### LOAD SOUNDS ######################################
     
@@ -1613,6 +1616,8 @@ var sketchProc = function (processingInstance) {
         this.reloadDelay = 600;
 
         this.just_jumped = false;
+        this.activate_recoil = false;
+        this.recoilFrameIndex = 0;
 
         this.state = {
           IDLE: false,
@@ -1683,7 +1688,12 @@ var sketchProc = function (processingInstance) {
 
         this.standing();
 
-        this.changeFrameIndex();
+        if(this.activate_recoil) {
+          this.changeRecoilFrameIndex();
+        }
+        else {
+          this.changeFrameIndex();
+        }
 
         pushMatrix();
         imageMode(CENTER);
@@ -1748,22 +1758,49 @@ var sketchProc = function (processingInstance) {
         }
       }
 
+      changeRecoilFrameIndex() {
+
+        this.curTime = millis();
+        if (this.curTime - this.preTime > 100) {
+          this.recoilFrameIndex++;
+          this.preTime = this.curTime;
+        }
+        if (this.recoilFrameIndex > 3) {
+          this.recoilFrameIndex = 0;
+          this.activate_recoil = false;
+        }
+      }
+
       idle(x) {
-        if (this.state.IDLE && !this.state.JUMP) {
-          image(
-            astroImages.idle[this.frameIndex],
-            x,
-            this.pos.y,
-            GAMEIMGSIZE,
-            GAMEIMGSIZE
-          );
+        if (this.state.IDLE && !this.state.JUMP && !this.state.RUN) {
+
+          if(!this.activate_recoil) {
+            image(
+              playerImages.idle[this.frameIndex],
+              x,
+              this.pos.y,
+              GAMEIMGSIZE,
+              GAMEIMGSIZE
+            );
+          }
+          else {
+            console.log(this.frameIndex);
+            image(
+              playerImages.recoil[this.recoilFrameIndex],
+              x,
+              this.pos.y,
+              GAMEIMGSIZE,
+              GAMEIMGSIZE
+            );
+          }
         }
       }
 
       run(x) {
-        if (this.state.RUN && !this.state.JUMP) {
+        if (this.state.RUN && !this.state.IDLE && !this.state.JUMP) {
+          console.log(this.frameIndex);
           image(
-            astroImages.run[this.frameIndex],
+            playerImages.run[this.frameIndex],
             x,
             this.pos.y,
             GAMEIMGSIZE,
@@ -1781,6 +1818,7 @@ var sketchProc = function (processingInstance) {
               "RIGHT",
               this.gunType
             );
+
           } else {
             bullets[this.bulletIndex].fired(
               this.pos.x - 20,
@@ -1788,7 +1826,12 @@ var sketchProc = function (processingInstance) {
               "LEFT",
               this.gunType
             );
+
+
           }
+
+          this.activate_recoil = (this.state.IDLE && this.gunType == "sniper");
+          
           this.preBulletTime = this.curBulletTime;
           this.bulletIndex++;
         }
@@ -1805,7 +1848,7 @@ var sketchProc = function (processingInstance) {
             this.just_jumped = false;
           }
           image(
-            astroImages.jump[this.frameIndex],
+            playerImages.jump[this.frameIndex],
             x,
             this.pos.y,
             GAMEIMGSIZE,
@@ -1837,7 +1880,6 @@ var sketchProc = function (processingInstance) {
         }
         if (keyArray[72] == 1) {
           this.shoot();
-          // this.changeState("SHOOT");
         }
 
         if (keyArray[32] === 1) {
@@ -1892,7 +1934,7 @@ var sketchProc = function (processingInstance) {
         pushMatrix();
         imageMode(CENTER);
         image(
-          astroImages.dying[this.frameIndex],
+          playerImages.dying[this.frameIndex],
           this.pos.x,
           this.pos.y,
           GAMEIMGSIZE * 3,
