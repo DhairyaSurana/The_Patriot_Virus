@@ -1,4 +1,4 @@
-var sketchProc = function(processingInstance) {
+var sketchProc = function (processingInstance) {
   with (processingInstance) {
     size(800, 800);
     frameRate(120);
@@ -7,7 +7,7 @@ var sketchProc = function(processingInstance) {
     //######################################################################################################
     //##############################################START HERE##############################################
     //######################################################################################################
- 
+
     const GAMEIMGSIZE = 50;
 
     //############################################### LOAD IMAGES ######################################
@@ -69,7 +69,7 @@ var sketchProc = function(processingInstance) {
       loadImage(url + "/images/r6f4.png"),
       loadImage(url + "/images/r6f5.png")
     ];
-    playerImages = {
+    astroImages = {
       idle: [
         loadImage(url + "/images/standf1.png"),
         loadImage(url + "/images/standf2.png"),
@@ -178,9 +178,9 @@ var sketchProc = function(processingInstance) {
     stairImage = loadImage(url + "/images/ram.png");
     mbImage = loadImage(url + "/images/motherboard.png");
 
-    player_image = loadImage("./images/astronaut.png");
-    enemy_image = loadImage("./images/alien.png");
-    wall_image = loadImage("./images/sciFiWall.png");
+    astroImage = loadImage("./images/astronaut.png");
+    alienImage = loadImage("./images/alien.png");
+    wallImage = loadImage("./images/sciFiWall.png");
 
     miniGameBackgroundImage1 = loadImage(url + "/images/digitalBackground.png");
     miniGameBackgroundImage2 = loadImage(
@@ -188,7 +188,8 @@ var sketchProc = function(processingInstance) {
     );
 
     //############################################### LOAD SOUNDS ######################################
-
+    
+    // SOUND EFFECTS
     laserSound = new Audio(url + "/sounds/laser.mp3");
     flameSound = new Audio(url + "/sounds/flame.mp3");
     jumpSound = new Audio(url + "/sounds/jump.mp3");
@@ -198,30 +199,30 @@ var sketchProc = function(processingInstance) {
     explosionSound = new Audio(url + "/sounds/explosion.mp3");
     powerUpSound = new Audio(url + "/sounds/powerUp.mp3");
     keySound = new Audio(url + "/sounds/keyCollected.mp3");
+    injuredSound = new Audio(url + "/sounds/injured.mp3");
+    shockSound = new Audio(url + "/sounds/shock.mp3");
+    
+    // SOUNDTRACKS
     mainMenuSoundtrack = new Audio(url + "/sounds/mainMenuSoundtrack.mp3");
-
     gameSoundtrack = new Audio(url + "/sounds/gameSoundtrack.mp3");
     gameSoundtrack.volume = 0.2;
-
     gameOverSoundtrack = new Audio(url + "/sounds/OnThingsToCome.mp3");
-
     additionMiniGameSoundtrack = new Audio(url + "/sounds/CyberREM.mp3");
     additionMiniGameSoundtrack.volume = 0.2;
-
-    multipleChoiceMiniGameSoundtrack = new Audio(
-      url + "/sounds/Stratosphere.mp3"
-    );
+    multipleChoiceMiniGameSoundtrack = new Audio(url + "/sounds/Stratosphere.mp3");
     multipleChoiceMiniGameSoundtrack.volume = 0.2;
-
     mazeMiniGameSoundtrack = new Audio(url + "/sounds/SectorOffLimits.mp3");
     mazeMiniGameSoundtrack.volume = 0.2;
 
-    var playSound = function(sound) {
-      sound.currentTime = 0;
+    var playSound = function (sound, restart_on_reload) {
+
+      if (restart_on_reload) {
+        sound.currentTime = 0;
+      }
       sound.play();
     };
 
-    var stopSound = function() {
+    var stopSoundtracks = function () {
       mainMenuSoundtrack.pause();
       gameSoundtrack.pause();
       gameOverSoundtrack.pause();
@@ -249,41 +250,13 @@ var sketchProc = function(processingInstance) {
     };
 
     var changePage = function changePage(page) {
-      stopSound();
+      stopSoundtracks();
       for (var key in STATE) {
         STATE[key] = false;
       }
       STATE[page] = true;
-
-      if (STATE.OPEN){
-        
-      }
-      else if (STATE.GAME) {
-        playSound(gameSoundtrack);
-      }
-      else if (STATE.MUTIPLECHOICE){
-        playSound(multipleChoiceMiniGameSoundtrack);
-      }
-      else if (STATE.ADDITION) {
-        playSound(additionMiniGameSoundtrack);
-      }
-
-      else if (STATE.THEMAZE) {
-        playSound(mazeMiniGameSoundtrack);
-      }
-      else if (STATE.INSTRUCTION) {
-
-      }
-      else if (STATE.SCORE) {
-
-      }
-      else if (STATE.ACHIVEMENT){
-
-      }
-      else if (STATE.GAMEOVER){
-        playSound(gameOverSoundtrack);
-      }
     };
+
     //############################################### OPENING SCREEN ######################################
     const IMAGESIZE = 64;
     const ROTATESPEED = 0.03;
@@ -392,13 +365,13 @@ var sketchProc = function(processingInstance) {
               this.pos.x > this.nextPos.x
                 ? this.pos.x--
                 : this.pos.x < this.nextPos.x
-                ? this.pos.x++
-                : (this.pos.x = this.pos.x);
+                  ? this.pos.x++
+                  : (this.pos.x = this.pos.x);
               this.pos.y > this.nextPos.y
                 ? this.pos.y--
                 : this.pos.y < this.nextPos.y
-                ? this.pos.y++
-                : (this.pos.y = this.pos.y);
+                  ? this.pos.y++
+                  : (this.pos.y = this.pos.y);
             }
             break;
           case "stationary":
@@ -506,13 +479,13 @@ var sketchProc = function(processingInstance) {
           this.pos.x > this.nextPos.x
             ? this.pos.x--
             : this.pos.x < this.nextPos.x
-            ? this.pos.x++
-            : (this.pos.x = this.pos.x);
+              ? this.pos.x++
+              : (this.pos.x = this.pos.x);
           this.pos.y > this.nextPos.y
             ? this.pos.y--
             : this.pos.y < this.nextPos.y
-            ? this.pos.y++
-            : (this.pos.y = this.pos.y);
+              ? this.pos.y++
+              : (this.pos.y = this.pos.y);
         }
       }
     }
@@ -541,6 +514,7 @@ var sketchProc = function(processingInstance) {
           SCORE: false,
           ACHIEVEMENT: false
         };
+
       }
 
       reset() {
@@ -636,6 +610,7 @@ var sketchProc = function(processingInstance) {
         fill(39, 36, 89, 150);
         textSize(15);
         text("Represented By Hung Tran & Dhairya Surana", 400, 280);
+        
       }
 
       select(x, y, clicked) {
@@ -988,20 +963,30 @@ var sketchProc = function(processingInstance) {
       }
 
       removeObj() {
-        if (this.name === "sniper" || this.name === "flameThrower") {
-          playSound(powerUpSound);
-        } else if (
-          this.name === "miniGame1" ||
-          this.name === "miniGame2" ||
-          this.name === "miniGame3"
-        ) {
-          playSound(keySound);
-        } else if (this.name === "energy") {
-          playSound(chargeSound);
-        } else if (this.name == "trap") {
-        } else if (this.name == "coin") {
-          playSound(blipSound);
+
+        switch (this.name) {
+
+          case "sniper":
+          case "flameThrower":
+            playSound(powerUpSound, true);
+            break;
+
+          case "miniGame1":
+          case "miniGame2":
+          case "miniGame3":
+            playSound(keySound, true);
+            break;
+
+          case "energy":
+            playSound(chargeSound, true);
+            break;
+
+          case "trap":
+          case "coin":
+            playSound(blipSound, true);
+            break;
         }
+
         this.pos.set(-1000, -1000);
       }
 
@@ -1009,46 +994,65 @@ var sketchProc = function(processingInstance) {
         this.changeFrameIndex();
         pushMatrix();
         imageMode(CENTER);
-        if (this.name === "wall") {
-          image(wireImage, this.pos.x, this.pos.y, GAMEIMGSIZE, GAMEIMGSIZE);
-        } else if (this.name === "stair") {
-          image(stairImage, this.pos.x, this.pos.y, GAMEIMGSIZE, GAMEIMGSIZE);
-        } else if (this.name === "binary") {
-          image(binaryImage, this.pos.x, this.pos.y, GAMEIMGSIZE, GAMEIMGSIZE);
-        } else if (this.name === "sniper") {
-          image(sniperRifle, this.pos.x, this.pos.y, GAMEIMGSIZE, GAMEIMGSIZE);
-        } else if (this.name === "flameThrower") {
-          image(flameThrower, this.pos.x, this.pos.y, GAMEIMGSIZE, GAMEIMGSIZE);
-        } else if (
-          this.name === "miniGame1" ||
-          this.name === "miniGame2" ||
-          this.name === "miniGame3"
-        ) {
-          image(keyImage, this.pos.x, this.pos.y, GAMEIMGSIZE, GAMEIMGSIZE);
-        } else if (this.name === "energy") {
-          image(
-            energyImages[this.frameIndex],
-            this.pos.x,
-            this.pos.y,
-            GAMEIMGSIZE,
-            GAMEIMGSIZE
-          );
-        } else if (this.name == "trap") {
-          image(
-            trapImages[this.frameIndex],
-            this.pos.x,
-            this.pos.y,
-            GAMEIMGSIZE,
-            GAMEIMGSIZE
-          );
-        } else if (this.name == "coin") {
-          image(
-            coinImages[this.frameIndex],
-            this.pos.x,
-            this.pos.y,
-            GAMEIMGSIZE,
-            GAMEIMGSIZE
-          );
+
+        switch (this.name) {
+
+          case "wall":
+            image(wireImage, this.pos.x, this.pos.y, GAMEIMGSIZE, GAMEIMGSIZE);
+            break;
+
+          case "stair":
+            image(stairImage, this.pos.x, this.pos.y, GAMEIMGSIZE, GAMEIMGSIZE);
+            break;
+
+          case "binary":
+            image(binaryImage, this.pos.x, this.pos.y, GAMEIMGSIZE, GAMEIMGSIZE);
+            break;
+
+          case "sniper":
+            image(sniperRifle, this.pos.x, this.pos.y, GAMEIMGSIZE, GAMEIMGSIZE);
+            break;
+
+          case "flameThrower":
+            image(flameThrower, this.pos.x, this.pos.y, GAMEIMGSIZE, GAMEIMGSIZE);
+            break;
+
+          case "miniGame1":
+          case "miniGame2":
+          case "miniGame3":
+            image(keyImage, this.pos.x, this.pos.y, GAMEIMGSIZE, GAMEIMGSIZE);
+            break;
+
+          case "energy":
+            image(
+              energyImages[this.frameIndex],
+              this.pos.x,
+              this.pos.y,
+              GAMEIMGSIZE,
+              GAMEIMGSIZE
+            );
+            break;
+
+          case "trap":
+            image(
+              trapImages[this.frameIndex],
+              this.pos.x,
+              this.pos.y,
+              GAMEIMGSIZE,
+              GAMEIMGSIZE
+            );
+            break;
+
+          case "coin":
+            image(
+              coinImages[this.frameIndex],
+              this.pos.x,
+              this.pos.y,
+              GAMEIMGSIZE,
+              GAMEIMGSIZE
+            );
+            break;
+
         }
         popMatrix();
       }
@@ -1087,12 +1091,12 @@ var sketchProc = function(processingInstance) {
       fired(x, y, direction, gunType) {
         if (gunType === "sniper") {
           this.ammoImage = bulletImages;
-          playSound(laserSound);
+          playSound(laserSound, true);
         }
 
         if (gunType === "flameThrower") {
           this.ammoImage = flameImages;
-          playSound(flameSound);
+          playSound(flameSound, true);
         }
         this.gunType = gunType;
         this.pos.set(x, y);
@@ -1267,6 +1271,7 @@ var sketchProc = function(processingInstance) {
             ) {
               // GROUND COLLISION
               this.player.updateGroundLv(this.objects[i].pos.y - GAMEIMGSIZE);
+              this.player.landing = 2;
               break;
             } else {
               this.player.groundLv = 1000;
@@ -1278,6 +1283,7 @@ var sketchProc = function(processingInstance) {
               this.player.pos.y - 25 < objBottom
             ) {
               this.player.pos.x -= 2;
+              this.player.changeState("IDLE");
             }
 
             if (
@@ -1286,6 +1292,8 @@ var sketchProc = function(processingInstance) {
               this.player.pos.y - 25 < objBottom
             ) {
               this.player.pos.x += 2;
+              this.player.changeState("IDLE");
+
             }
           } else if (this.objects[i].name === "flameThrower") {
             if (
@@ -1384,7 +1392,6 @@ var sketchProc = function(processingInstance) {
             ) < 50
           ) {
             this.player.deductHp();
-            // changePage("SCORE");
           }
 
           for (var z = 0; z < bullets.length; z++) {
@@ -1396,9 +1403,6 @@ var sketchProc = function(processingInstance) {
                 bullets[z].pos.y
               ) < 50
             ) {
-              if (!this.monsters[i].die) {
-                playSound(explosionSound);
-              }
               this.monsters[i].deductHp();
             }
           }
@@ -1433,6 +1437,29 @@ var sketchProc = function(processingInstance) {
         }
       }
 
+      playSoundWhenNear() {
+
+        for (var i = 0; i < this.crushTraps.length; i++) {
+
+          if (dist(this.player.pos.x, this.player.pos.y, this.crushTraps[i].pos.x, this.crushTraps[i].pos.y) < 400) {
+            this.crushTraps[i].is_near_player = true;
+          }
+          else {
+            this.crushTraps[i].is_near_player = false;
+          }
+        }
+
+        for (var i = 0; i < this.shockTraps.length; i++) {
+
+          if (dist(this.player.pos.x, this.player.pos.y, this.shockTraps[i].pos.x, this.shockTraps[i].pos.y) < 400) {
+            this.shockTraps[i].is_near_player = true;
+          }
+          else {
+            this.shockTraps[i].is_near_player = false;
+          }
+        }
+      }
+
       display() {
         for (var i = 0; i < this.objects.length; i++) {
           this.objects[i].display();
@@ -1451,6 +1478,7 @@ var sketchProc = function(processingInstance) {
           this.crushTraps[i].display();
         }
 
+        this.playSoundWhenNear();
         this.collisionCheck();
       }
     }
@@ -1520,6 +1548,7 @@ var sketchProc = function(processingInstance) {
         if (this.curHpTime - this.preHpTime > 120 && this.hp > 0) {
           this.hp -= 10;
           this.preHpTime = this.curHpTime;
+          playSound(explosionSound, true);
         }
         if (this.hp === 0) {
           this.killed();
@@ -1651,6 +1680,7 @@ var sketchProc = function(processingInstance) {
         } else {
           this.acceleration.set(0, 0.1);
         }
+
         this.standing();
 
         this.changeFrameIndex();
@@ -1694,6 +1724,7 @@ var sketchProc = function(processingInstance) {
         if (this.curHpTime - this.preHpTime > 120 && this.hp > 0) {
           this.hp -= 2;
           this.preHpTime = this.curHpTime;
+          playSound(injuredSound, false);
         }
         if (this.hp === 0) {
           changePage("GAMEOVER");
@@ -1720,7 +1751,7 @@ var sketchProc = function(processingInstance) {
       idle(x) {
         if (this.state.IDLE && !this.state.JUMP) {
           image(
-            playerImages.idle[this.frameIndex],
+            astroImages.idle[this.frameIndex],
             x,
             this.pos.y,
             GAMEIMGSIZE,
@@ -1732,7 +1763,7 @@ var sketchProc = function(processingInstance) {
       run(x) {
         if (this.state.RUN && !this.state.JUMP) {
           image(
-            playerImages.run[this.frameIndex],
+            astroImages.run[this.frameIndex],
             x,
             this.pos.y,
             GAMEIMGSIZE,
@@ -1770,11 +1801,11 @@ var sketchProc = function(processingInstance) {
       jump(x) {
         if (this.state.JUMP) {
           if (this.just_jumped) {
-            playSound(jumpSound);
+            playSound(jumpSound, true);
             this.just_jumped = false;
           }
           image(
-            playerImages.jump[this.frameIndex],
+            astroImages.jump[this.frameIndex],
             x,
             this.pos.y,
             GAMEIMGSIZE,
@@ -1861,7 +1892,7 @@ var sketchProc = function(processingInstance) {
         pushMatrix();
         imageMode(CENTER);
         image(
-          playerImages.dying[this.frameIndex],
+          astroImages.dying[this.frameIndex],
           this.pos.x,
           this.pos.y,
           GAMEIMGSIZE * 3,
@@ -1890,6 +1921,7 @@ var sketchProc = function(processingInstance) {
         this.state = "TRAP SWITCH";
 
         this.is_activated = false;
+        this.is_near_player = false;
       }
 
       changeFrameIndex() {
@@ -1922,6 +1954,9 @@ var sketchProc = function(processingInstance) {
       }
 
       executeShock() {
+        if (this.is_near_player) {
+          playSound(shockSound, false);
+        }
         image(
           this.switchImages[3],
           this.pos.x,
@@ -1985,6 +2020,7 @@ var sketchProc = function(processingInstance) {
         this.preTime = this.curTime;
 
         this.is_activated = false;
+        this.is_near_player = false;
       }
 
       changeFrameIndex() {
@@ -2009,9 +2045,9 @@ var sketchProc = function(processingInstance) {
         imageMode(CENTER);
 
         if (this.is_activated) {
-          // if(this.frameIndex == 3) {
-          //   //playSound(clangSound);
-          // }
+          if (this.frameIndex == 3 && this.is_near_player) {
+            playSound(clangSound, true);
+          }
           image(
             this.crushImages[this.frameIndex],
             this.pos.x,
@@ -2063,7 +2099,8 @@ var sketchProc = function(processingInstance) {
         if (this.game.player.state["RUN"]) {
           if (this.game.player.direction["RIGHT"]) {
             this.pos.x -= rate;
-          } else if (this.game.player.direction["LEFT"]) {
+          }
+          if (this.game.player.direction["LEFT"]) {
             this.pos.x += rate;
           }
 
@@ -2209,7 +2246,6 @@ var sketchProc = function(processingInstance) {
       }
 
       display() {
-        playSound(multipleChoiceMiniGameSoundtrack);
 
         image(miniGameBackgroundImage1, 400, 400, 800, 800);
         this.currentTime = millis();
@@ -2724,7 +2760,7 @@ var sketchProc = function(processingInstance) {
 
     class maze_game_obj {
       constructor() {
-        this.player = new player_obj(20, 360, player_image);
+        this.player = new player_obj(20, 360, astroImage);
         this.enemies = [];
         this.destinations = [];
 
@@ -2779,12 +2815,12 @@ var sketchProc = function(processingInstance) {
           for (var j = 0; j < this.tilemap[i].length; j++) {
             switch (this.tilemap[i][j]) {
               case "w":
-                this.walls.push(new wall_obj(j * 20, i * 20, wall_image));
+                this.walls.push(new wall_obj(j * 20, i * 20, wallImage));
 
                 break;
 
               case "e":
-                this.enemies.push(new enemy_obj(j * 20, i * 20, enemy_image));
+                this.enemies.push(new enemy_obj(j * 20, i * 20, alienImage));
 
                 break;
 
@@ -2857,11 +2893,11 @@ var sketchProc = function(processingInstance) {
           for (var j = 0; j < this.tilemap[i].length; j++) {
             switch (this.tilemap[i][j]) {
               case "w":
-                this.walls.push(new wall_obj(j * 20, i * 20, wall_image));
+                this.walls.push(new wall_obj(j * 20, i * 20, wallImage));
                 break;
 
               case "e":
-                this.enemies.push(new enemy_obj(j * 20, i * 20, enemy_image));
+                this.enemies.push(new enemy_obj(j * 20, i * 20, alienImage));
                 break;
 
               case "d":
@@ -2917,7 +2953,7 @@ var sketchProc = function(processingInstance) {
     );
     //############################################### INPUT CONTROL ######################################
 
-    var keyPressed = function() {
+    var keyPressed = function () {
       if (keyCode === 192) {
         changePage("OPEN");
       }
@@ -2985,7 +3021,7 @@ var sketchProc = function(processingInstance) {
       }
     };
 
-    var keyReleased = function() {
+    var keyReleased = function () {
       keyArray[keyCode] = 0;
 
       if (STATE.THEMAZE) {
@@ -2996,7 +3032,7 @@ var sketchProc = function(processingInstance) {
       }
     };
 
-    var mouseClicked = function() {
+    var mouseClicked = function () {
       if (STATE.OPEN && !openScreen.startShow) {
         openScreen.select(mouseX, mouseY, true);
       }
@@ -3055,7 +3091,7 @@ var sketchProc = function(processingInstance) {
       }
     };
 
-    var mouseMoved = function() {
+    var mouseMoved = function () {
       if (STATE.OPEN) {
         openScreen.select(mouseX, mouseY, false);
       }
@@ -3063,20 +3099,22 @@ var sketchProc = function(processingInstance) {
 
     //############################################### EXECUTION ######################################
     background(245, 222, 179);
-    var draw = function() {
+    var draw = function () {
       if (STATE.OPEN) {
+        playSound(mainMenuSoundtrack, false);
         sectionPos.x < 0
           ? (sectionPos.x += 4)
           : sectionPos.x > 0
-          ? (sectionPos.x -= 4)
-          : 1;
+            ? (sectionPos.x -= 4)
+            : 1;
 
         sectionPos.y < 0
           ? (sectionPos.y += 4)
           : sectionPos.y > 0
-          ? (sectionPos.y -= 4)
-          : 1;
+            ? (sectionPos.y -= 4)
+            : 1;
       } else if (STATE.GAME) {
+        playSound(gameSoundtrack, false);
         parallaxSpaceLayer.display(0.05);
         parallaxFarStarsLayer.display(0.07);
         parallaxStation1Layer.display(0.2);
@@ -3108,20 +3146,27 @@ var sketchProc = function(processingInstance) {
         textAlign(CENTER, CENTER);
         text(collectedItems.coins, 430, 25);
       } else if (STATE.INSTRUCTION) {
+        playSound(mainMenuSoundtrack, false);
         sectionPos.x > -800 ? (sectionPos.x -= 4) : 1;
       } else if (STATE.SCORE) {
+        playSound(mainMenuSoundtrack, false);
         sectionPos.x < 800 ? (sectionPos.x += 4) : 1;
       } else if (STATE.ACHIEVEMENT) {
+        playSound(mainMenuSoundtrack, false);
         sectionPos.y > -800 ? (sectionPos.y -= 4) : 1;
       } else if (STATE.MUTIPLECHOICE) {
+        playSound(multipleChoiceMiniGameSoundtrack, false);
         multipleChoiceMiniGameScreen.display();
       } else if (STATE.ADDITION) {
+        playSound(additionMiniGameSoundtrack, false);
         additionMiniGameScreen.display();
       } else if (STATE.THEMAZE) {
+        playSound(mazeMiniGameSoundtrack, false);
         imageMode(CORNERS);
         theMazeMiniGameScreen.display();
         imageMode(CENTER);
       } else if (STATE.GAMEOVER) {
+        playSound(gameOverSoundtrack, false);
         gameOver.display();
       }
 
@@ -3142,6 +3187,7 @@ var sketchProc = function(processingInstance) {
         achievementScreen.display();
         popMatrix();
       }
+
     };
 
     //######################################################################################################
