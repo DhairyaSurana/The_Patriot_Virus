@@ -229,6 +229,7 @@ var sketchProc = function (processingInstance) {
     mainMenuSoundtrack = new Audio(url + "/sounds/mainMenuSoundtrack.mp3");
     gameSoundtrack = new Audio(url + "/sounds/gameSoundtrack.mp3");
     gameSoundtrack.volume = 0.2;
+    gameWonSoundtrack = new Audio(url + "/sounds/EscapeFromTheInsaneMachines.mp3");
     gameOverSoundtrack = new Audio(url + "/sounds/OnThingsToCome.mp3");
     additionMiniGameSoundtrack = new Audio(url + "/sounds/CyberREM.mp3");
     additionMiniGameSoundtrack.volume = 0.2;
@@ -264,6 +265,7 @@ var sketchProc = function (processingInstance) {
       INSTRUCTION: false,
       SCORE: false,
       ACHIEVEMENT: false,
+      GAMEWON: false,
       GAMEOVER: false
     };
 
@@ -1548,7 +1550,9 @@ var sketchProc = function (processingInstance) {
           this.portals[i].display();
         }
 
-
+        if(collectedItems.key == 3) {
+          changePage("GAMEWON");
+        }
       }
     }
 
@@ -2020,12 +2024,14 @@ var sketchProc = function (processingInstance) {
       }
     }
 
-    //############################################### GAME OVER SCREEN ######################################
-    class gameOverObj extends obj {
-      constructor(x, y) {
+    //############################################### GAME ENDING SCREEN ######################################
+    class gameEndingObj extends obj {
+      constructor(text, images,  x, y) {
         super();
         this.pos = new PVector(x, y);
         this.rgb = 0;
+        this.text = text;
+        this.images = images;
       }
 
       changeFrameIndex() {
@@ -2034,8 +2040,8 @@ var sketchProc = function (processingInstance) {
           this.frameIndex++;
           this.preTime = this.curTime;
         }
-        if (this.frameIndex > 4) {
-          this.frameIndex = 4;
+        if (this.frameIndex > this.images.length - 1) {
+          this.frameIndex = this.images.length - 1;
         }
       }
 
@@ -2053,12 +2059,12 @@ var sketchProc = function (processingInstance) {
         textFont(gameFont, 100);
         rectMode(CENTER);
         textAlign(CENTER, CENTER);
-        text("GAME OVER", 400, 260);
+        text(this.text, 400, 260);
 
         pushMatrix();
         imageMode(CENTER);
         image(
-          playerImages.dying[this.frameIndex],
+          this.images[this.frameIndex],
           this.pos.x,
           this.pos.y,
           GAMEIMGSIZE * 3,
@@ -2250,6 +2256,7 @@ var sketchProc = function (processingInstance) {
     //############################################### PARALLAX OBJECT ##################################
 
     class parallaxObj {
+
       constructor(image, game, x, y, w, h, loop_condition) {
         this.pos = new PVector(x, y);
         this.image = image;
@@ -3082,7 +3089,8 @@ var sketchProc = function (processingInstance) {
     var achievementScreen = new achievementObj();
     var sectionPos = new PVector(0, 0);
     var game = new gameObj();
-    var gameOver = new gameOverObj(400, 500);
+    var gameWon = new gameEndingObj("GAME WON", playerImages.run, 400, 500);
+    var gameOver = new gameEndingObj("GAME OVER", playerImages.dying, 400, 500);
     var multipleChoiceMiniGameScreen = new multipleChoiceMiniGameObj();
     var additionMiniGameScreen = new additionMiniGameObj();
     var theMazeMiniGameScreen = new maze_game_obj();
@@ -3332,6 +3340,9 @@ var sketchProc = function (processingInstance) {
         imageMode(CORNERS);
         theMazeMiniGameScreen.display();
         imageMode(CENTER);
+      } else if(STATE.GAMEWON){
+        playSound(gameWonSoundtrack, false);
+        gameWon.display();
       } else if (STATE.GAMEOVER) {
         playSound(gameOverSoundtrack, false);
         gameOver.display();
@@ -3343,6 +3354,7 @@ var sketchProc = function (processingInstance) {
           STATE.ADDITION |
           STATE.MUTIPLECHOICE |
           STATE.THEMAZE |
+          STATE.GAMEWON |
           STATE.GAMEOVER
         )
       ) {

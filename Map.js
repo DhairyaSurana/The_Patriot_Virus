@@ -42,7 +42,7 @@ var tileMap = [
   "w   wwwww             w ww     w                                  bbb               wwwwwwwwwwwwwwwwwwwwwww",
   "w                   1             w                                                                       w",
   "w    rr             w      ww        w                                r             wwwwwwww     wwwwwwwwww",
-  "w                                 w                    m       r   p   #                                  w",
+  "w                                 w                    m       r   p12 3                                   w",
   "w    rr               w   bbbb                      bbbbbbbbbbbbbbbbbbbb                    sssss         w",
   "w                               w                                                           bbbbb         w",
   "w    rr                 ww  w                     r                                                       w",
