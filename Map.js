@@ -1,18 +1,19 @@
 /*
-w = wall
-m = monster
-f = flame thrower gun
-b = stair binary
-r = stair ram
-1 = key 1, multiple choice game
-2 = key 2, quick math game
-3 = key 3, escape the maze
-e = energy
-n = sniper
-s = shock trap
-= = crush trap
-c = collectible item
-g = gound
+w : wall
+m : monster
+f : flame thrower gun
+b : stair binary
+r : stair ram
+1 : key 1, multiple choice game
+2 : key 2, quick math game
+3 : key 3, escape the maze
+e : energy
+n : sniper
+s : shock trap
+= : crush trap
+c : collectible item
+g : gound
+# : portal
 */
 
 var tileMap = [
@@ -31,7 +32,7 @@ var tileMap = [
   "w                      w    w  r            b                wwwwww       w v     wwwwwwwwwwww            w",
   "w                  b   wcn       r  m  s    b   bbbbb                           w    www                  w",
   "w   m m                wwww    m r wwwwww            b                       ww    m m m m m m ssssssssss w",
-  "w                  b       r                            r rrrrr                  w      wwwwwwwwwwwwwwwwwww",
+  "w            #     b       r                            r rrrrr                  w      wwwwwwwwwwwwwwwwwww",
   "w   w   w   wwwwwww          r                                            w                               w",
   "w   w   w                r    r               wwww                                                        w",
   "w   w   w                  bb                                              w           rrrrr          rr  w",
@@ -41,13 +42,13 @@ var tileMap = [
   "w   wwwww             w ww     w                                  bbb               wwwwwwwwwwwwwwwwwwwwwww",
   "w                   1             w                                                                       w",
   "w    rr             w      ww        w                                r             wwwwwwww     wwwwwwwwww",
-  "w                                 w                    m       r   p         m                            w",
+  "w                                 w                    m       r   p   #                                  w",
   "w    rr               w   bbbb                      bbbbbbbbbbbbbbbbbbbb                    sssss         w",
   "w                               w                                                           bbbbb         w",
   "w    rr                 ww  w                     r                                                       w",
   "w                                                                                                         w",
   "w    rr                    rr                   r                                                         w",
-  "w                                                                                                         w",
+  "w                  #                                                                m              #      w",
   "w   w   w     wwwwwwwwwwwwweewwwwwwwwwwwwwwwww                                  wwwwwwwwwwwwwwwwwwwwwwwwwww",
   "w   w   w     w                              wb                                         m               c w",
   "w   w R w     w            bb                w b                                wwwwwwwwwwwwwwwwwwwwwwwwwww",
@@ -73,12 +74,12 @@ var tileMap = [
   "w                                                        cc==ccccccc                                      w",
   "w                                      e                 wwwwwwwwwww                                      w",
   "w                                      bb                                    rrrrrrrrrrrrrrrrr            w",
-  "w                                                                                   =      err            w",
+  "w                                                                                   =    #  rr            w",
   "w                                     m                  wwwwwwwwwwwwrrrrrrrrrrrrrrrrrrrrrrrrr            w",
   "w                                     bb                 wwwwwwwwwww         r                  rr        w",
   "w                                 bb                     wwwwwwwwww          r                            w",
   "w                                                        wwwwwwwww           r                  rrr       w",
-  "w                             bb                         wwwwwwww            r                       r    w",
+  "w                             bb                         wwwwwwww            r           e           r    w",
   "w                         bb                             wwwwwww             r      ccccccccccccccc    cccw",
   "w                     bb                                 wwwwww              r      ccccccccccccccc rr cccw",
   "w                                                        wwwww               r      ccccccccccccccc    cccw",
@@ -112,7 +113,7 @@ var tileMap = [
   "w                w       bbbbbbbbbb                  bbbbbbbbbbb                          bb              w",
   "w        w    f    n                      w                                m                              w",
   "w       ww    w   wwww                                                                 bb       cc    cc  w",
-  "w  c   wwww  mw     =                     w                 m           m                       cc    cc  w",
+  "w  c   wwww  mw     =                     w                 m           m            #          cc    cc  w",
   "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",
   "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww"
 ];
