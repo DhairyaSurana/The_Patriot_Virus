@@ -630,6 +630,8 @@ var sketchProc = function(processingInstance) {
               ) < 50
             ) {
              
+              console.log("Bullet: " + bullets[z].pos.x);
+              console.log("Monster: " + this.monsters[i].pos.x);
               if(!this.monsters[i].die) {
                 playSound(explosionSound);
               }

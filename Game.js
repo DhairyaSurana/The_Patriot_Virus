@@ -102,6 +102,24 @@ var sketchProc = function (processingInstance) {
         loadImage(url + "/images/jumpf4.png")
       ]
     };
+
+    monsterImages = {
+      move: [
+        loadImage(url + "/images/monsterf1.png"),
+        loadImage(url + "/images/monsterf2.png"),
+        loadImage(url + "/images/monsterf3.png"),
+        loadImage(url + "/images/monsterf4.png")
+      ],
+
+      explode: [
+        loadImage(url + "/images/monsterExplodef1.png"),
+        loadImage(url + "/images/monsterExplodef2.png"),
+        loadImage(url + "/images/monsterExplodef3.png"),
+        loadImage(url + "/images/monsterExplodef4.png")
+      ]
+    };
+
+
     bulletImages = [
       loadImage(url + "/images/bulletf1.png"),
       loadImage(url + "/images/bulletf2.png"),
@@ -114,13 +132,6 @@ var sketchProc = function (processingInstance) {
       loadImage(url + "/images/flamef2.png"),
       loadImage(url + "/images/flamef3.png"),
       loadImage(url + "/images/flamef4.png")
-    ];
-
-    monsterImages = [
-      loadImage(url + "/images/monsterf1.png"),
-      loadImage(url + "/images/monsterf2.png"),
-      loadImage(url + "/images/monsterf3.png"),
-      loadImage(url + "/images/monsterf4.png")
     ];
 
     trapImages = [
@@ -191,7 +202,7 @@ var sketchProc = function (processingInstance) {
     miniGameBackgroundImage2 = loadImage(url + "/images/digitalBackground2.png");
 
     //############################################### LOAD SOUNDS ######################################
-    
+
     // SOUND EFFECTS
     laserSound = new Audio(url + "/sounds/laser.mp3");
     flameSound = new Audio(url + "/sounds/flame.mp3");
@@ -204,7 +215,7 @@ var sketchProc = function (processingInstance) {
     keySound = new Audio(url + "/sounds/keyCollected.mp3");
     injuredSound = new Audio(url + "/sounds/injured.mp3");
     shockSound = new Audio(url + "/sounds/shock.mp3");
-    
+
     // SOUNDTRACKS
     mainMenuSoundtrack = new Audio(url + "/sounds/mainMenuSoundtrack.mp3");
     gameSoundtrack = new Audio(url + "/sounds/gameSoundtrack.mp3");
@@ -613,7 +624,7 @@ var sketchProc = function (processingInstance) {
         fill(39, 36, 89, 150);
         textSize(15);
         text("Represented By Hung Tran & Dhairya Surana", 400, 280);
-        
+
       }
 
       select(x, y, clicked) {
@@ -744,28 +755,32 @@ var sketchProc = function (processingInstance) {
         switch (this.travelPos) {
           case "left":
             if (!this.moving) {
-              this.move(-400, 50);
+              this.move
+                (-400, 50);
               this.travelPos = "top";
             }
             break;
 
           case "top":
             if (!this.moving) {
-              this.move(-50, 400);
+              this.move
+                (-50, 400);
               this.travelPos = "right";
             }
             break;
 
           case "right":
             if (!this.moving) {
-              this.move(-400, 750);
+              this.move
+                (-400, 750);
               this.travelPos = "bottom";
             }
             break;
 
           case "bottom":
             if (!this.moving) {
-              this.move(-750, 400);
+              this.move
+                (-750, 400);
               this.travelPos = "left";
             }
             break;
@@ -1385,7 +1400,7 @@ var sketchProc = function (processingInstance) {
           }
         }
 
-        for (i = 0; i < this.monsters.length; i++) {
+        for (var i = 0; i < this.monsters.length; i++) {
           if (
             dist(
               this.player.pos.x,
@@ -1406,6 +1421,8 @@ var sketchProc = function (processingInstance) {
                 bullets[z].pos.y
               ) < 50
             ) {
+              // console.log("Bullet: " + bullets[z].pos.x);
+              // console.log("Monster: " + this.monsters[i].pos.x);
               this.monsters[i].deductHp();
             }
           }
@@ -1464,6 +1481,10 @@ var sketchProc = function (processingInstance) {
       }
 
       display() {
+
+        this.playSoundWhenNear();
+        this.collisionCheck();
+
         for (var i = 0; i < this.objects.length; i++) {
           this.objects[i].display();
         }
@@ -1481,8 +1502,7 @@ var sketchProc = function (processingInstance) {
           this.crushTraps[i].display();
         }
 
-        this.playSoundWhenNear();
-        this.collisionCheck();
+       
       }
     }
 
@@ -1492,53 +1512,85 @@ var sketchProc = function (processingInstance) {
         super();
         this.pos = new PVector(x, y);
         this.frameIndex = 0;
-        this.direction = {
-          LEFT: true,
-          RIGHT: false
-        };
 
         this.curHpTime = millis();
         this.preHpTime = this.curHpTime;
         this.hp = 50;
 
-        this.die = false;
+        this.state = {
+          MOVE: true,
+          EXPLODE: false
+        };
+
+        this.direction = {
+          LEFT: true,
+          RIGHT: false
+        };
+
+        this.explosion_complete = false;
+
       }
 
-      killed() {
-        this.die = true;
-        this.pos.set(-1000, -1000);
+     
+      move(x) {
+
+        if (this.state.MOVE) {
+          image(
+            monsterImages.move[this.frameIndex],
+            x,
+            this.pos.y,
+            GAMEIMGSIZE,
+            GAMEIMGSIZE
+          );
+        }
+
+      }
+
+      explode(x) {
+
+        //console.log("EXPLODE: " + this.state.EXPLODE);
+        if(this.state.EXPLODE) {
+          console.log("EXPLODE: " + this.frameIndex);
+          image(
+            monsterImages.explode[this.frameIndex],
+            x,
+            this.pos.y,
+            GAMEIMGSIZE,
+            GAMEIMGSIZE
+          );
+
+          if(this.frameIndex == 3) {
+            this.pos.set(-1000, -1000);
+            this.explosion_complete = true;
+          }
+        }
+        
+      
       }
 
       display(playerX, playerY) {
-        if (this.die) {
-          return;
-        }
-        this.curHpTime = millis();
-        this.changeFrameIndex();
-        this.move(playerX, playerY);
 
-        pushMatrix();
-        if (this.direction.RIGHT) {
-          scale(-1, 1);
-          image(
-            monsterImages[this.frameIndex],
-            -this.pos.x,
-            this.pos.y,
-            GAMEIMGSIZE,
-            GAMEIMGSIZE
-          );
-        } else {
-          image(
-            monsterImages[this.frameIndex],
-            this.pos.x,
-            this.pos.y,
-            GAMEIMGSIZE,
-            GAMEIMGSIZE
-          );
-        }
-        popMatrix();
+        if (!this.explosion_complete) {
+          //console.log("asdf");
+          this.curHpTime = millis();
 
-        this.displayHP();
+          this.changeFrameIndex();          
+
+          this.setTarget(playerX, playerY);
+
+          pushMatrix();
+          if (this.direction.RIGHT) {
+            scale(-1, 1);
+            this.move(-this.pos.x);
+            this.explode(-this.pos.x);
+          } else {
+            this.move(this.pos.x);
+            this.explode(this.pos.x);
+          }
+          popMatrix();
+
+          this.displayHP();
+        }
       }
 
       displayHP() {
@@ -1548,18 +1600,22 @@ var sketchProc = function (processingInstance) {
       }
 
       deductHp() {
+        //console.log(this.hp);
         if (this.curHpTime - this.preHpTime > 120 && this.hp > 0) {
           this.hp -= 10;
           this.preHpTime = this.curHpTime;
           playSound(explosionSound, true);
         }
         if (this.hp === 0) {
-          this.killed();
-          //TODO: Die animation
+          //console.log("Health = 0");
+          this.frameIndex = 0;
+          this.state.EXPLODE = true;
+          this.state.MOVE = false;
+          
         }
       }
 
-      move(playerX, playerY) {
+      setTarget(playerX, playerY) {
         if (abs(this.pos.y) - abs(playerY) === 0) {
           if (this.pos.x - playerX < 0) {
             this.pos.x++;
@@ -1616,7 +1672,7 @@ var sketchProc = function (processingInstance) {
         this.reloadDelay = 600;
 
         this.just_jumped = false;
-        this.activate_recoil = false;
+        this.recoil_activated = false;
         this.recoilFrameIndex = 0;
 
         this.state = {
@@ -1688,7 +1744,7 @@ var sketchProc = function (processingInstance) {
 
         this.standing();
 
-        if(this.activate_recoil) {
+        if (this.recoil_activated) {
           this.changeRecoilFrameIndex();
         }
         else {
@@ -1767,14 +1823,14 @@ var sketchProc = function (processingInstance) {
         }
         if (this.recoilFrameIndex > 3) {
           this.recoilFrameIndex = 0;
-          this.activate_recoil = false;
+          this.recoil_activated = false;
         }
       }
 
       idle(x) {
         if (this.state.IDLE && !this.state.JUMP && !this.state.RUN) {
 
-          if(!this.activate_recoil) {
+          if (!this.recoil_activated) {
             image(
               playerImages.idle[this.frameIndex],
               x,
@@ -1784,7 +1840,6 @@ var sketchProc = function (processingInstance) {
             );
           }
           else {
-            console.log(this.frameIndex);
             image(
               playerImages.recoil[this.recoilFrameIndex],
               x,
@@ -1798,7 +1853,6 @@ var sketchProc = function (processingInstance) {
 
       run(x) {
         if (this.state.RUN && !this.state.IDLE && !this.state.JUMP) {
-          console.log(this.frameIndex);
           image(
             playerImages.run[this.frameIndex],
             x,
@@ -1807,6 +1861,20 @@ var sketchProc = function (processingInstance) {
             GAMEIMGSIZE
           );
         }
+      }
+
+      drawGunFlash() {
+
+        fill(255, 0, 0);
+        if(!this.state.JUMP) {
+          if(this.direction.RIGHT) {
+            ellipse(this.pos.x + 25, this.pos.y - 5, 15, 15);
+          }
+          else {
+            ellipse(this.pos.x - 25, this.pos.y - 5, 15, 15);
+          }
+        }
+        //noFill();
       }
 
       shoot() {
@@ -1826,11 +1894,13 @@ var sketchProc = function (processingInstance) {
               "LEFT",
               this.gunType
             );
-
-
+           
           }
 
-          this.activate_recoil = (this.state.IDLE && this.gunType == "sniper");
+          this.recoil_activated = (this.state.IDLE && this.gunType == "sniper");
+          if(this.gunType == "sniper") {
+            this.drawGunFlash();
+          }
           
           this.preBulletTime = this.curBulletTime;
           this.bulletIndex++;
@@ -3169,6 +3239,7 @@ var sketchProc = function (processingInstance) {
         popMatrix();
 
         rectMode(LEFT);
+        fill(0, 255, 127);
         rect(0, 0, game.player.hp * 16, 50);
 
         if (game.player.gunType === "sniper") {
