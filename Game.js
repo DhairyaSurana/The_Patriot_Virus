@@ -211,19 +211,41 @@ var sketchProc = function (processingInstance) {
     //############################################### LOAD SOUNDS ######################################
 
     // SOUND EFFECTS
-    laserSound = new Audio(url + "/sounds/laser.mp3");
-    flameSound = new Audio(url + "/sounds/flame.mp3");
-    jumpSound = new Audio(url + "/sounds/jump.mp3");
-    chargeSound = new Audio(url + "/sounds/charge.mp3");
-    blipSound = new Audio(url + "/sounds/blip.mp3");
-    clangSound = new Audio(url + "/sounds/clang.mp3"); // Crush trap
-    explosionSound = new Audio(url + "/sounds/explosion.mp3");
+    bulletSounds = {
+      sniper: new Audio(url + "/sounds/laser.mp3"),
+      flameThrower: new Audio(url + "/sounds/flame.mp3")
+    };
+    
     powerUpSound = new Audio(url + "/sounds/powerUp.mp3");
-    keySound = new Audio(url + "/sounds/keyCollected.mp3");
-    injuredSound = new Audio(url + "/sounds/injured.mp3");
-    shockSound = new Audio(url + "/sounds/shock.mp3");
+    keySound = new Audio(url + "/sounds/keyCollected.mp3"); 
+    objSounds = {
+      energy : new Audio(url + "/sounds/charge.mp3"),
+      coin : new Audio(url + "/sounds/blip.mp3"),
+      key : new Audio(url + "/sounds/keyCollected.mp3"),
+      miniGame1 : keySound,
+      miniGame2 : keySound,
+      miniGame3 : keySound,
+      sniper : powerUpSound,
+      flameThrower : powerUpSound
+    };
+
+    playerSounds = {
+      run : { 
+        even_frame: new Audio(url + "/sounds/run1.mp3"),
+        odd_frame: new Audio(url + "/sounds/run2.mp3")
+      },
+      jump : new Audio(url + "/sounds/jump.mp3"),
+      hurt : new Audio(url + "/sounds/injured.mp3")
+    }
+
+    trapSounds = {
+      shock :  new Audio(url + "/sounds/shock.mp3"),
+      crush : new Audio(url + "/sounds/clang.mp3")
+    };
+
+    explosionSound = new Audio(url + "/sounds/explosion.mp3");
     teleportSound = new Audio(url + "/sounds/teleport.mp3");
-    portalSound = new Audio(url + "/sounds/portal.mp3");
+    
 
     // SOUNDTRACKS
     mainMenuSoundtrack = new Audio(url + "/sounds/mainMenuSoundtrack.mp3");
@@ -992,30 +1014,7 @@ var sketchProc = function (processingInstance) {
       }
 
       removeObj() {
-
-        switch (this.name) {
-
-          case "sniper":
-          case "flameThrower":
-            playSound(powerUpSound, true);
-            break;
-
-          case "miniGame1":
-          case "miniGame2":
-          case "miniGame3":
-            playSound(keySound, true);
-            break;
-
-          case "energy":
-            playSound(chargeSound, true);
-            break;
-
-          case "trap":
-          case "coin":
-            playSound(blipSound, true);
-            break;
-        }
-
+        playSound(objSounds[this.name], true);
         this.pos.set(-1000, -1000);
       }
 
@@ -1128,15 +1127,9 @@ var sketchProc = function (processingInstance) {
       }
 
       fired(x, y, direction, gunType) {
-        if (gunType === "sniper") {
-          this.ammoImage = bulletImages;
-          playSound(laserSound, true);
-        }
 
-        if (gunType === "flameThrower") {
-          this.ammoImage = flameImages;
-          playSound(flameSound, true);
-        }
+        playSound(bulletSounds[gunType], true);
+        this.ammoImage = (gunType === "sniper") ? bulletImages : flameImages;
         this.gunType = gunType;
         this.pos.set(x, y);
         this.direction = direction;
@@ -1449,7 +1442,7 @@ var sketchProc = function (processingInstance) {
                 bullets[z].pos.y
               ) < 50
             ) {
-              
+
               this.monsters[i].deductHp();
             }
           }
@@ -1483,7 +1476,7 @@ var sketchProc = function (processingInstance) {
           }
         }
 
-        for(var i = 0; i < this.portals.length; i++) {
+        for (var i = 0; i < this.portals.length; i++) {
 
           if (
             dist(
@@ -1493,10 +1486,10 @@ var sketchProc = function (processingInstance) {
               this.portals[i].pos.y
             ) < 50
           ) {
-            
+
             var new_portal_index = round(random(0, this.portals.length - 1));
             this.player.teleport(this.portals[new_portal_index].pos);
-           
+
           }
         }
       }
@@ -1550,7 +1543,7 @@ var sketchProc = function (processingInstance) {
           this.portals[i].display();
         }
 
-        if(collectedItems.key == 3) {
+        if (collectedItems.key == 3) {
           changePage("GAMEWON");
         }
       }
@@ -1744,7 +1737,7 @@ var sketchProc = function (processingInstance) {
 
         playSound(teleportSound, true);
 
-        if(this.direction.RIGHT) {
+        if (this.direction.RIGHT) {
           this.setPos(pos.x + 60, pos.y);
         }
         else {
@@ -1849,7 +1842,7 @@ var sketchProc = function (processingInstance) {
         if (this.curHpTime - this.preHpTime > 120 && this.hp > 0) {
           this.hp -= 2;
           this.preHpTime = this.curHpTime;
-          playSound(injuredSound, false);
+          playSound(playerSounds["hurt"], false);
         }
         if (this.hp === 0) {
           changePage("GAMEOVER");
@@ -1910,8 +1903,18 @@ var sketchProc = function (processingInstance) {
         }
       }
 
+      playRunningSound() {
+        if (this.frameIndex % 2 == 0) {
+          playSound(playerSounds["run"]["even_frame"], false);
+        }
+        else {
+          playSound(playerSounds["run"]["odd_frame"], false);
+        }
+      }
+
       run(x) {
         if (this.state.RUN && !this.state.IDLE && !this.state.JUMP) {
+          this.playRunningSound();
           image(
             playerImages.run[this.frameIndex],
             x,
@@ -1972,7 +1975,7 @@ var sketchProc = function (processingInstance) {
       jump(x) {
         if (this.state.JUMP) {
           if (this.just_jumped) {
-            playSound(jumpSound, true);
+            playSound(playerSounds["jump"], true);
             this.just_jumped = false;
           }
           image(
@@ -2026,7 +2029,7 @@ var sketchProc = function (processingInstance) {
 
     //############################################### GAME ENDING SCREEN ######################################
     class gameEndingObj extends obj {
-      constructor(text, images,  x, y) {
+      constructor(text, images, x, y) {
         super();
         this.pos = new PVector(x, y);
         this.rgb = 0;
@@ -2127,7 +2130,7 @@ var sketchProc = function (processingInstance) {
 
       executeShock() {
         if (this.is_near_player) {
-          playSound(shockSound, false);
+          playSound(trapSounds["shock"], false);
         }
         image(
           this.switchImages[3],
@@ -2218,7 +2221,7 @@ var sketchProc = function (processingInstance) {
 
         if (this.is_activated) {
           if (this.frameIndex == 3 && this.is_near_player) {
-            playSound(clangSound, true);
+            playSound(trapSounds["crush"], true);
           }
           image(
             this.crushImages[this.frameIndex],
@@ -3340,7 +3343,7 @@ var sketchProc = function (processingInstance) {
         imageMode(CORNERS);
         theMazeMiniGameScreen.display();
         imageMode(CENTER);
-      } else if(STATE.GAMEWON){
+      } else if (STATE.GAMEWON) {
         playSound(gameWonSoundtrack, false);
         gameWon.display();
       } else if (STATE.GAMEOVER) {
