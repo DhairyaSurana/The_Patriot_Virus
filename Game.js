@@ -687,13 +687,15 @@ var sketchProc = function(processingInstance) {
     }
     //############################################### INSTRUCTION SCREEN ######################################
     var content =
-      "Feed the virus instructions into MIPS architecture " +
-      "\nprocessor that control the rockets " +
-      "to destroy them." +
+      "Collect all 3 key to win the game" +
+      "\nEach key is associated with a question" +
+      "\nEnergy Bar: Increase current HP" +
+      "\nFlame Thrower Gun: high damage, low range" +
+      "\nSniper: low range, high damage" +
       "\nMove Left: A" +
       "\nMove Right: D" +
       "\nJump: Space Bar" +
-      "\nAttack: Right Click" +
+      "\nAttack: H" +
       "\nExit: `";
 
     //CITATION: brownianMotion is initially comes from
