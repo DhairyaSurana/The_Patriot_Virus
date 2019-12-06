@@ -1,29 +1,26 @@
-# THE PATRIOT VIRUS
-
+# THE PATRIOT VIRUS  
 ### Author: Hung Tran, Dhairya Surana
 
 > ## IMPORTANT!!
 
-### http://thepatriotvirus.s3-website-us-east-1.amazonaws.com/
+To run this game, download as a zip file and
+EXTRACT all files from the zip.
+Double-click on the HTML page to load the game.
 
-To run the game, please double click on index.html in the same folder or go to the above website
+This game DOES NOT WORK on Khan Acedemy due to extra features that are not provided by the Khan Academy IDE.
 
-This game DOES NOT WORK on Khan Academy due to various reasons.  
-One of the main reasons is that the game is written in ES6 and contained exteral images.
 
 > ## Game Layout
 
 - Main page:
 
-  - Menu section
-  - Instruction section
-  - Score section
-  - Achievements section
+  - Menu section:
+  - Instruction section:
+  - Score section:
+  - Achievements section:
 
-- Game:
-  - Synopsis
+- Play page:
   - Game play
-  - Mini Games
 
 > ## Main Page
 
@@ -34,57 +31,32 @@ One of the main reasons is that the game is written in ES6 and contained exteral
      left and replaced by instruction content.
   - **SCORE**: The menu content will slowing shift to the right  
      and replace by the 3 highest scores of the player.
-  - **ACHIVEMENT**: The menu content will slowly shift upward  
+  - **ACHIEVEMENT**: The menu content will slowly shift upward  
      and replaced by the achivement mark that the player's earned.
 
 * ### Instruction section
-
-  - Move left: A
-  - Move right: D
-  - Jump: Spacebar
-  - Press **`** to go back to the main menu
-
+  - A set of instruction displayed to tell the player how  
+    to operate the game.
+  - The player could go back to the menu screen by pressing **`**
 * ### Score section
-  - The top 3 highest scores will be displayed.
-  - Press **`** to go back to the main menu
+  - The top 3 highest score will be displayed. The background  
+    has a big rocket flying from the mid left side to the screen  
+    to the mid top side, then mid right, then repeated.
+  - The player can go back to the menu screen by pressing **`**
 * ### Achievements section
+  - In the main game, there are 3 small challenges. Every time the  
+    player completes one of them, they will receive an achivement. All  
+    the achievements from the player will be displayed here. Fireworks will  
+    be displayed to celebrate the player's accomplishments.
+  - The player could go back to the menu screen by pressing **`**.
 
-  - Monster kills: The number of enemies killed
-  - CPU Collected: The number of CPU chips collected.
-  - Key collected: The number of keys collected.
+> ## Play Page
 
-  - Press **`** to go back to the main menu
-
-> # GAME
-
-## Synopsis:
-
-    In 1989, the Soviet Union was on the verge of collapse. In a futile attempt to destroy its rival, a nuke was launched and headed for the US. Luckily, an American spy that worked as a deep cover agent for the Soviet missile program uploaded a "Patriot" virus to disable the missile via its MIPS system.
-
-    You play as the Patriot Virus.
-
-## Game play:
-
-### The player will appear in a space-like environment (Rocket's Avionics system) in a MIPS map. The player will be surrounded by various objects:
-
-    - Droids (monsters): Serve as the Avionics security system. These droids will wander a certain area and chase after the player if he or she gets close enough
-
-    - Batteries: Will increase the player's health.
-
-    - CPU chips: Will increase the player's score.
-
-    - Sniper: Long range and medium damage weapon. Allows the player to damage 2 or more droids at once.
-
-    - Flamethrower: Short range and high damage weapon. Suitable for attacking 1 droid at a time.
-
-    - Portal: Will allow the player to teleport to various other portals around the map.
-
-    - Keys: The main security flaws of the rocket system. Gather all 3 keys to win the game. Each key will involve a mini-game.
-
-## Mini Games:
-
-    - Multiple Choice: The player must solve a multiple-choice hex arithmetic question
-
-    - Addition: The player must solve a basic arithmetic question. Be careful, the game is timed.
-
-    - Maze: The player must escape the aliens in a maze!
+-   The play page will open up to a 50 x 50 character screen with the player on the bottom-right corner. 
+    The goal of the game is to collect all the batteries and kill all the droids.
+    The player animation consists of a space soldier and the droids are essentially one-eyed
+    robots that fly around. The player can kill the robots by pressing the h key to shoot plasma bullets.
+    To collect the batteries, the player must move close to them. 
+    
+    Overall, the tilemap used so far is only a small section of the final tilemap, which is currently still under
+    development. The final tilemap will be 96 x 112 character tilemap.
