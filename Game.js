@@ -1,3 +1,9 @@
+/*
+GAME DESCRIPTION:
+Final Project
+Hung Tran, Dhairya
+Please read README.md
+*/
 var sketchProc = function(processingInstance) {
   with (processingInstance) {
     size(800, 800);
